@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><title>Atlas Dunia — Navigasi</title>
+<meta name="theme-color" content="#0f7f7f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Atlas Dunia">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6f5;--card:#fff;--tx:#0f2a2a;--mu:#5f7575;--pr:#0f7f7f;--pl:#dff1ef;--bd:#e2eae8;--sea:#d6ebec;--land:#ebe8d2;--ln:#b9c7a0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1717;--card:#162323;--tx:#e6f2f0;--mu:#8fa8a5;--pr:#3fc1bb;--pl:#1d3a39;--bd:#243736;--sea:#12303a;--land:#2a3a35;--ln:#3b5249}}
+:root[data-theme="dark"]{--bg:#0e1717;--card:#162323;--tx:#e6f2f0;--mu:#8fa8a5;--pr:#3fc1bb;--pl:#1d3a39;--bd:#243736;--sea:#12303a;--land:#2a3a35;--ln:#3b5249}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+main{flex:1;overflow-y:auto;padding:16px 16px 8px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top h1{margin:0;font-size:22px;line-height:1.1}.top small{display:block;color:var(--pr);font-size:10px;letter-spacing:.06em;font-weight:700;text-transform:uppercase}
+.ib{width:40px;height:40px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:16px;cursor:pointer;flex:none}
+.sp{flex:1}
+input,select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+.chips{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:99px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;font:inherit;font-size:13px}
+.chip.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.mapw{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--bd);aspect-ratio:360/252}
+.mapw svg{width:100%;height:100%;display:block;touch-action:none}
+.ctl{position:absolute;right:8px;bottom:8px;display:flex;flex-direction:column;gap:6px}
+.ctl button{width:36px;height:36px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:18px;cursor:pointer}
+.cap{font-size:11px;color:var(--mu);margin:6px 2px}
+h2{font-size:16px;margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline}h2 a{font-size:12px;color:var(--pr);font-weight:600;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--pl);display:grid;place-items:center;font-size:22px;flex:none}
+.row b{display:block;font-size:15px}.row span{color:var(--mu);font-size:12px}.row i{margin-left:auto;color:var(--pr);font-style:normal;font-size:18px}
+.btn{padding:11px 14px;border-radius:12px;border:0;background:var(--pr);color:#fff;font:inherit;font-weight:600;cursor:pointer;flex:1}
+.btn.sec{background:var(--pl);color:var(--pr)}.btns{display:flex;gap:8px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lm{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 6px;text-align:center;font-size:12px;position:relative}
+.lm div{font-size:26px}.lm button{position:absolute;top:2px;right:2px;border:0;background:none;font-size:14px;cursor:pointer;color:var(--pr)}
+.sum{border:2px solid var(--pr);border-radius:16px;padding:14px;margin:12px 0}.sum big{font-size:28px;font-weight:700}
+.sum small{display:block;color:var(--mu)}
+.res{margin-top:6px}.res .card{padding:8px 12px;margin:4px 0}
+nav{display:flex;gap:4px;padding:8px 12px 10px;background:var(--card);border-top:1px solid var(--bd)}
+nav button{flex:1;border:0;background:none;color:var(--mu);border-radius:12px;padding:6px 0;font:inherit;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:19px}nav button[aria-current=page]{background:var(--pl);color:var(--pr);font-weight:700}
+.step{display:flex;gap:10px;padding:5px 0;color:var(--tx)}.empty{color:var(--mu);text-align:center;padding:30px 0}
+</style></head><body><div id="app"><main id="v"></main>
+<nav id="nav"></nav></div>
+<script>
+const D=[
+{n:'Asia',e:'🌏',z:[95,30,170],c:[
+{n:'Indonesia',k:[{n:'Jakarta',la:-6.17,lo:106.82,d:'Ibu kota Indonesia, pusat bisnis, budaya, dan sejarah.',l:[['Monas','🗼',-6.1754,106.8272],['Masjid Istiqlal','🕌',-6.1702,106.8312],['Kota Tua','🏛️',-6.1352,106.8133]]},{n:'Serang (Banten)',la:-6.12,lo:106.15,d:'Pusat Provinsi Banten, dekat situs Banten Lama, bekas pelabuhan kesultanan.',l:[['Masjid Agung Banten','🕌',-6.0331,106.1517],['Keraton Surosowan','🏰',-6.0347,106.1546]]},{n:'Bandung',la:-6.91,lo:107.61,d:'Kota di dataran tinggi Jawa Barat, dikenal arsitektur kolonial dan alamnya.',l:[['Gedung Sate','🏛️',-6.9025,107.6187],['Tangkuban Parahu','🌋',-6.7596,107.6098]]},{n:'Yogyakarta',la:-7.8,lo:110.36,d:'Kota budaya dan pelajar dengan keraton serta candi besar.',l:[['Keraton Yogyakarta','🏰',-7.8053,110.3642],['Tugu Yogyakarta','🗼',-7.7828,110.3671],['Candi Prambanan','🛕',-7.752,110.4915],['Candi Borobudur','🛕',-7.6079,110.2038]]},{n:'Surabaya',la:-7.25,lo:112.75,d:'Kota pahlawan di Jawa Timur.',l:[['Tugu Pahlawan','🗼',-7.2459,112.7378],['Jembatan Suramadu','🌉',-7.1996,112.7805]]},{n:'Bali (Denpasar)',la:-8.65,lo:115.22,d:'Pulau dewata dengan pura di tebing dan pantai.',l:[['Tanah Lot','🛕',-8.6212,115.0868],['Pura Uluwatu','⛩️',-8.8291,115.0849],['Garuda Wisnu Kencana','🗿',-8.8103,115.1676]]},{n:'Banda Aceh',la:5.55,lo:95.32,d:'Ujung barat Indonesia, kota Serambi Mekkah.',l:[['Masjid Raya Baiturrahman','🕌',5.5537,95.3174],['Museum Tsunami Aceh','🏛️',5.5481,95.3206]]},{n:'Medan',la:3.59,lo:98.67,d:'Kota terbesar di Sumatra dengan warisan kesultanan Deli.',l:[['Istana Maimun','🏰',3.5753,98.6836],['Masjid Raya Al Mashun','🕌',3.5752,98.687]]},{n:'Bukittinggi',la:-0.31,lo:100.37,d:'Kota sejuk di dataran tinggi Minangkabau.',l:[['Jam Gadang','🗼',-0.3053,100.3695],['Ngarai Sianok','🏞️',-0.3033,100.3567]]},{n:'Palembang',la:-2.98,lo:104.76,d:'Kota di tepi Sungai Musi, bekas pusat Sriwijaya.',l:[['Jembatan Ampera','🌉',-2.9917,104.7656],['Benteng Kuto Besak','🏰',-2.9895,104.7621]]},{n:'Bogor',la:-6.6,lo:106.8,d:'Kota hujan dengan kebun raya dan istana.',l:[['Kebun Raya Bogor','🌳',-6.5976,106.7997],['Istana Bogor','🏛️',-6.5975,106.797]]},{n:'Semarang',la:-6.97,lo:110.42,d:'Ibu kota Jawa Tengah, kota pelabuhan bersejarah.',l:[['Lawang Sewu','🏛️',-6.9841,110.4106],['Sam Poo Kong','🛕',-6.9971,110.3961]]},{n:'Surakarta (Solo)',la:-7.57,lo:110.82,d:'Kota keraton dan batik di Jawa Tengah.',l:[['Keraton Surakarta','🏰',-7.5788,110.8278],['Pasar Gede','🏛️',-7.57,110.8316]]},{n:'Bromo (Probolinggo)',la:-7.75,lo:113.2,d:'Kawasan gunung api aktif di Jawa Timur.',l:[['Gunung Bromo','🌋',-7.9425,112.953]]},{n:'Pontianak',la:0,lo:109.34,d:'Kota yang dilalui garis khatulistiwa di Kalimantan Barat.',l:[['Tugu Khatulistiwa','🗼',-0.0014,109.3231]]},{n:'Makassar',la:-5.15,lo:119.41,d:'Pintu gerbang Indonesia timur, kota benteng dan pantai.',l:[['Fort Rotterdam','🏰',-5.1342,119.4054],['Pantai Losari','🌅',-5.1417,119.4067]]},{n:'Manado',la:1.47,lo:124.84,d:'Kota di Sulawesi Utara, dekat taman laut Bunaken.',l:[['Taman Laut Bunaken','🤿',1.6197,124.7619]]},{n:'Lombok (Mataram)',la:-8.58,lo:116.1,d:'Pulau dengan gunung berapi dan pantai jernih.',l:[['Gunung Rinjani','⛰️',-8.4112,116.4573],['Gili Trawangan','🏝️',-8.3517,116.039]]},{n:'Labuan Bajo',la:-8.5,lo:119.89,d:'Gerbang menuju Taman Nasional Komodo.',l:[['Pulau Komodo','🐉',-8.55,119.489],['Pulau Padar','⛰️',-8.653,119.588]]},{n:'Ambon',la:-3.7,lo:128.18,d:'Kota di Maluku dengan sejarah rempah.',l:[['Benteng Victoria','🏰',-3.6948,128.1767],['Monumen Pattimura','🗼',-3.6959,128.1808]]},{n:'Waisai (Raja Ampat)',la:-0.43,lo:130.83,d:'Kepulauan Raja Ampat, surga keanekaragaman laut.',l:[['Piaynemo','🏝️',0.5667,130.2833],['Wayag','🐠',0.17,130.03]]},{n:'Jayapura',la:-2.54,lo:140.7,d:'Ibu kota Provinsi Papua di tepi Teluk Humboldt.',l:[['Danau Sentani','🏞️',-2.6,140.5],['Jembatan Youtefa','🌉',-2.59,140.718]]}]},
+{n:'Jepang',k:[{n:'Tokyo',la:35.68,lo:139.69,d:'Metropolis modern yang berpadu dengan kuil tradisional.',l:[['Tokyo Tower','🗼',35.6586,139.7454],['Senso-ji','⛩️',35.7148,139.7967],['Shibuya Crossing','🚦',35.6595,139.7005]]}]},
+{n:'Tiongkok',k:[{n:'Beijing',la:39.9,lo:116.4,d:'Ibu kota dengan warisan istana kekaisaran.',l:[['Kota Terlarang','🏯',39.9163,116.3972],['Tembok Besar','🧱',40.4319,116.5704]]}]},{n:'Singapura',k:[{n:'Singapura',la:1.35,lo:103.82,d:'Kota-negara modern di ujung Semenanjung Malaya.',l:[['Marina Bay Sands','🏨',1.2834,103.8607],['Merlion','🦁',1.2868,103.8545]]}]},{n:'Thailand',k:[{n:'Bangkok',la:13.75,lo:100.5,d:'Ibu kota dengan istana dan kuil keemasan.',l:[['Wat Arun','🛕',13.7437,100.4889],['Grand Palace','🏯',13.75,100.4913]]}]},{n:'Korea Selatan',k:[{n:'Seoul',la:37.57,lo:126.98,d:'Istana tradisional berdampingan dengan kota teknologi.',l:[['Gyeongbokgung','🏯',37.5796,126.977],['N Seoul Tower','🗼',37.5512,126.9882]]}]},{n:'India',k:[{n:'Agra',la:27.18,lo:78.02,d:'Kota di tepi Sungai Yamuna, rumah monumen cinta Mughal.',l:[['Taj Mahal','🕌',27.1751,78.0421]]}]},{n:'Uni Emirat Arab',k:[{n:'Dubai',la:25.2,lo:55.27,d:'Kota gurun futuristik dengan gedung pencakar langit.',l:[['Burj Khalifa','🏙️',25.1972,55.2744]]}]}]},
+{n:'Afrika',e:'🌍',z:[20,2,150],c:[
+{n:'Mesir',k:[{n:'Kairo',la:30.04,lo:31.24,d:'Kota di tepi Sungai Nil, dekat piramida kuno.',l:[['Piramida Giza','🔺',29.9792,31.1342],['Sphinx','🦁',29.9753,31.1376]]}]},
+{n:'Afrika Selatan',k:[{n:'Cape Town',la:-33.92,lo:18.42,d:'Kota pesisir di kaki Table Mountain.',l:[['Table Mountain','⛰️',-33.9628,18.4098],['Robben Island','⛴️',-33.8077,18.3714]]}]},{n:'Maroko',k:[{n:'Marrakesh',la:31.63,lo:-8,d:'Kota kuno berdinding merah dengan pasar ramai.',l:[['Jemaa el-Fnaa','🎪',31.6258,-7.9891],['Masjid Koutoubia','🕌',31.6237,-7.9936]]}]}]},
+{n:'Eropa',e:'🌍',z:[12,52,70],c:[
+{n:'Prancis',k:[{n:'Paris',la:48.8566,lo:2.3522,d:'Seni, sungai, dan landmark ikonis di tepi Seine.',l:[['Menara Eiffel','🗼',48.8584,2.2945],['Museum Louvre','🖼️',48.8606,2.3376],['Arc de Triomphe','🏛️',48.8738,2.295]]}]},
+{n:'Italia',k:[{n:'Roma',la:41.9,lo:12.5,d:'Kota abadi dengan reruntuhan Romawi.',l:[['Colosseum','🏟️',41.8902,12.4922],['Vatikan','⛪',41.9022,12.4539]]}]},
+{n:'Inggris',k:[{n:'London',la:51.5,lo:-0.12,d:'Ibu kota di tepi Sungai Thames.',l:[['Big Ben','🕰️',51.5007,-0.1246],['London Eye','🎡',51.5033,-0.1195]]}]},{n:'Spanyol',k:[{n:'Barcelona',la:41.39,lo:2.17,d:'Kota pesisir dengan arsitektur Gaudí.',l:[['Sagrada Família','⛪',41.4036,2.1744],['Park Güell','🌳',41.4145,2.1527]]}]},{n:'Jerman',k:[{n:'Berlin',la:52.52,lo:13.4,d:'Ibu kota dengan sejarah abad ke-20 yang kuat.',l:[['Gerbang Brandenburg','🏛️',52.5163,13.3777]]}]},{n:'Yunani',k:[{n:'Athena',la:37.98,lo:23.73,d:'Kota kuno tempat lahirnya demokrasi.',l:[['Parthenon','🏛️',37.9715,23.7257]]}]}]},
+{n:'Amerika Utara',e:'🌎',z:[-100,42,150],c:[
+{n:'Amerika Serikat',k:[{n:'New York',la:40.71,lo:-74,d:'Kota yang tak pernah tidur.',l:[['Patung Liberty','🗽',40.6892,-74.0445],['Times Square','🌆',40.758,-73.9855]]}]},{n:'Kanada',k:[{n:'Toronto',la:43.65,lo:-79.38,d:'Kota terbesar Kanada di tepi Danau Ontario.',l:[['CN Tower','🗼',43.6426,-79.3871]]}]},{n:'Meksiko',k:[{n:'Mexico City',la:19.43,lo:-99.13,d:'Ibu kota di atas bekas kota Aztek.',l:[['Angel of Independence','🏛️',19.427,-99.1677]]}]}]},
+{n:'Amerika Selatan',e:'🌎',z:[-60,-18,130],c:[
+{n:'Brasil',k:[{n:'Rio de Janeiro',la:-22.9,lo:-43.2,d:'Pantai, gunung, dan karnaval.',l:[['Christ the Redeemer','✝️',-22.9519,-43.2105],['Copacabana','🏖️',-22.9711,-43.1822]]}]},
+{n:'Peru',k:[{n:'Cusco',la:-13.52,lo:-71.97,d:'Gerbang menuju peradaban Inca.',l:[['Machu Picchu','🏔️',-13.1631,-72.545]]}]},{n:'Argentina',k:[{n:'Buenos Aires',la:-34.6,lo:-58.38,d:'Ibu kota dengan tango dan boulevard lebar.',l:[['Obelisco','🗼',-34.6037,-58.3816]]}]}]},
+{n:'Oseania',e:'🌏',z:[140,-28,110],c:[
+{n:'Australia',k:[{n:'Sydney',la:-33.87,lo:151.21,d:'Kota pelabuhan dengan arsitektur ikonis.',l:[['Sydney Opera House','🎭',-33.8568,151.2153],['Harbour Bridge','🌉',-33.8523,151.2108]]}]},{n:'Selandia Baru',k:[{n:'Auckland',la:-36.85,lo:174.76,d:'Kota pelabuhan di antara dua teluk.',l:[['Sky Tower','🗼',-36.8484,174.7622]]}]}]},
+{n:'Antarktika',e:'🧊',z:[0,-78,300],c:[
+{n:'Wilayah Antarktika',k:[{n:'Stasiun McMurdo',la:-77.85,lo:166.67,d:'Stasiun riset terbesar, tanpa kota reguler.',l:[['McMurdo','🧊',-77.85,166.67]]}]}]}];
+(function(){const E=(bn,cn,s)=>{const b=D.find(x=>x.n===bn);let c=b.c.find(x=>x.n===cn);if(!c){c={n:cn,k:[]};b.c.push(c)}s.split('\n').forEach(r=>{const p=r.trim().split('|');if(p.length<5)return;if(D.some(bb=>bb.c.some(cc=>cc.k.some(k=>k.n===p[0]))))return;c.k.push({n:p[0],la:+p[1],lo:+p[2],d:p[3],l:p[4].split(';').map(q=>{const t=q.split('~');return[t[0],t[1],+t[2],+t[3]]})})})};
+E('Asia','Indonesia',`Semarang|-6.97|110.42|Kota pelabuhan Jawa Tengah dengan bangunan kolonial.|Lawang Sewu~🏛️~-6.984~110.4108;Kota Lama Semarang~🏘️~-6.968~110.429
+Malang|-7.98|112.63|Kota sejuk di Jawa Timur, gerbang menuju Bromo.|Alun-Alun Malang~🌳~-7.9816~112.6309;Gunung Bromo~🌋~-7.9425~112.953
+Solo|-7.57|110.82|Kota budaya Jawa dengan dua keraton.|Keraton Surakarta~🏰~-7.5782~110.8283;Pasar Gede~🏪~-7.5724~110.8335
+Cirebon|-6.71|108.56|Kota kesultanan di pesisir utara Jawa.|Keraton Kasepuhan~🏰~-6.7229~108.566;Gua Sunyaragi~🛕~-6.7122~108.5442
+Makassar|-5.15|119.43|Pintu gerbang Indonesia timur, kota benteng dan pantai.|Benteng Rotterdam~🏰~-5.1342~119.4054;Pantai Losari~🏖️~-5.1436~119.4066
+Toraja (Rantepao)|-2.97|119.9|Tanah adat dengan rumah tongkonan dan makam tebing.|Londa~⚰️~-3.01~119.87
+Manado|1.47|124.84|Kota di Sulawesi Utara, dekat taman laut Bunaken.|Taman Laut Bunaken~🐠~1.6244~124.7667
+Pontianak|-0.03|109.33|Kota yang dilewati garis khatulistiwa.|Tugu Khatulistiwa~🌐~0.0003~109.33
+Balikpapan|-1.27|116.83|Kota pantai Kalimantan Timur, gerbang menuju IKN.|Mangrove Margomulyo~🌿~-1.2125~116.8185
+Banjarmasin|-3.32|114.59|Kota seribu sungai dengan pasar terapung.|Pasar Terapung Lok Baintan~🛶~-3.35~114.67;Masjid Sultan Suriansyah~🕌~-3.291~114.59
+Samarinda|-0.5|117.15|Kota tepi Sungai Mahakam.|Islamic Center Samarinda~🕌~-0.506~117.136
+Mataram (Lombok)|-8.58|116.12|Pusat Pulau Lombok dengan pantai dan gunung.|Pantai Senggigi~🏖️~-8.495~116.039;Gunung Rinjani~🌋~-8.4115~116.4573
+Labuan Bajo|-8.5|119.89|Gerbang menuju Taman Nasional Komodo.|Pulau Komodo~🦎~-8.55~119.45;Pulau Padar~🏝️~-8.654~119.584
+Kupang|-10.17|123.6|Ibu kota Nusa Tenggara Timur.|Pantai Lasiana~🏖️~-10.1397~123.662
+Ambon|-3.7|128.17|Kota musik dan rempah Maluku.|Benteng Victoria~🏰~-3.6954~128.1778;Pantai Natsepa~🏖️~-3.641~128.237
+Jayapura|-2.53|140.7|Kota di ujung timur Indonesia.|Danau Sentani~🏞️~-2.6~140.5
+Waisai (Raja Ampat)|-0.43|130.83|Surga kepulauan dengan laut terkaya dunia.|Piaynemo~🏝️~-0.56~130.28
+Padang|-0.95|100.35|Kota pantai Sumatra Barat, pusat kuliner Minang.|Jembatan Siti Nurbaya~🌉~-0.9604~100.364
+Pekanbaru|0.51|101.45|Kota di tepi Sungai Siak, Riau.|Masjid Raya An-Nur~🕌~0.4989~101.4228
+Jambi|-1.6|103.6|Kota Sungai Batanghari, dekat kompleks candi kuno.|Candi Muaro Jambi~🛕~-1.478~103.664
+Batam|1.13|104.05|Pulau industri yang berseberangan dengan Singapura.|Jembatan Barelang~🌉~0.997~104.012
+Bandar Lampung|-5.43|105.26|Gerbang selatan Sumatra.|Menara Siger~🗼~-5.872~105.76
+Tanjung Pandan (Belitung)|-2.75|107.65|Pulau granit raksasa dan pantai jernih.|Pantai Tanjung Tinggi~🏖️~-2.55~107.69`);
+E('Asia','Malaysia',`Kuala Lumpur|3.14|101.69|Ibu kota Malaysia dengan menara kembar ikonis.|Menara Petronas~🏙️~3.1579~101.7116;Batu Caves~🛕~3.2379~101.684
+George Town (Penang)|5.41|100.34|Kota warisan dunia dan surga kuliner.|Kek Lok Si~🛕~5.3988~100.273
+Malaka|2.19|102.25|Kota bersejarah jalur rempah.|A Famosa~🏰~2.1914~102.2498`);
+E('Asia','Filipina',`Manila|14.6|120.98|Ibu kota Filipina dengan kota tembok Intramuros.|Intramuros~🏰~14.5896~120.9747;Taman Rizal~🌳~14.5831~120.9794
+Cebu|10.32|123.89|Kota pelabuhan tertua Filipina.|Basilika Santo Nino~⛪~10.2942~123.902`);
+E('Asia','Vietnam',`Hanoi|21.03|105.85|Ibu kota Vietnam dengan kota tua dan danau.|Danau Hoan Kiem~🏞️~21.0288~105.8522;Kuil Sastra~🛕~21.0285~105.8355
+Ho Chi Minh City|10.78|106.7|Kota terbesar Vietnam, penuh motor dan kuliner.|Katedral Notre-Dame Saigon~⛪~10.7798~106.699;Pasar Ben Thanh~🏪~10.7725~106.698`);
+E('Asia','Kamboja',`Siem Reap|13.36|103.86|Gerbang menuju kompleks Angkor.|Angkor Wat~🛕~13.4125~103.867`);
+E('Asia','Myanmar',`Yangon|16.8|96.15|Kota dengan pagoda emas raksasa.|Pagoda Shwedagon~🛕~16.7983~96.1495`);
+E('Asia','Thailand',`Bangkok|13.75|100.5|Ibu kota Thailand, kuil emas dan pasar apung.|Grand Palace~🏰~13.75~100.4913
+Chiang Mai|18.79|98.98|Kota kuno di pegunungan utara Thailand.|Doi Suthep~🛕~18.8048~98.9217
+Phuket|7.88|98.39|Pulau pantai terbesar Thailand.|Big Buddha Phuket~🗿~7.8275~98.3128`);
+E('Asia','India',`Delhi|28.61|77.21|Ibu kota India, perpaduan Mughal dan modern.|India Gate~🏛️~28.6129~77.2295;Benteng Merah~🏰~28.6562~77.241
+Mumbai|19.08|72.88|Kota pantai dan pusat film Bollywood.|Gateway of India~🏛️~18.922~72.8347
+Agra|27.18|78.02|Kota Mughal rumah bagi mahakarya cinta.|Taj Mahal~🕌~27.1751~78.0421
+Jaipur|26.91|75.79|Kota merah muda Rajasthan.|Hawa Mahal~🏰~26.9239~75.8267`);
+E('Asia','Nepal',`Kathmandu|27.72|85.32|Lembah kuil di kaki Himalaya.|Boudhanath~🛕~27.7215~85.362;Swayambhunath~🛕~27.7149~85.2904`);
+E('Asia','Sri Lanka',`Kandy|7.29|80.63|Kota dataran tinggi dengan kuil gigi Buddha.|Kuil Gigi Buddha~🛕~7.2936~80.6413`);
+E('Asia','Turki',`Istanbul|41.01|28.98|Kota dua benua di antara Eropa dan Asia.|Hagia Sophia~🕌~41.0086~28.9802;Masjid Biru~🕌~41.0054~28.9768`);
+E('Asia','Arab Saudi',`Mekkah|21.42|39.83|Kota suci umat Islam.|Masjidil Haram~🕋~21.4225~39.8262
+Madinah|24.47|39.61|Kota Nabi, kota suci kedua.|Masjid Nabawi~🕌~24.4672~39.6111`);
+E('Asia','Qatar',`Doha|25.29|51.53|Ibu kota Qatar dengan cakrawala futuristik.|Museum Seni Islam~🏛️~25.2954~51.539`);
+E('Asia','Yordania',`Petra|30.33|35.44|Kota batu merah yang dipahat di tebing.|Al-Khazneh~🏛️~30.3216~35.4513`);
+E('Asia','Taiwan',`Taipei|25.03|121.57|Ibu kota Taiwan, pasar malam dan gedung tinggi.|Taipei 101~🏙️~25.034~121.5645`);
+E('Asia','Jepang',`Tokyo|35.68|139.69|Metropolis terbesar dunia.|Tokyo Tower~🗼~35.6586~139.7454;Kuil Senso-ji~⛩️~35.7148~139.7967
+Kyoto|35.01|135.77|Mantan ibu kota dengan ribuan kuil.|Fushimi Inari~⛩️~34.9671~135.7727;Kinkaku-ji~🛕~35.0394~135.7292
+Osaka|34.69|135.5|Kota kuliner dan kastil megah.|Kastil Osaka~🏯~34.6873~135.5262`);
+E('Asia','Korea Selatan',`Busan|35.18|129.08|Kota pelabuhan dan pantai terbesar Korea.|Desa Gamcheon~🏘️~35.0975~129.0106
+Jeju|33.5|126.53|Pulau vulkanik tujuan liburan.|Gunung Halla~🌋~33.3617~126.5292`);
+E('Asia','Tiongkok',`Beijing|39.9|116.4|Ibu kota Tiongkok dengan istana kekaisaran.|Kota Terlarang~🏯~39.9163~116.3972;Tembok Besar Badaling~🧱~40.3587~116.0153
+Shanghai|31.23|121.47|Kota terbesar Tiongkok, pusat keuangan.|The Bund~🌆~31.24~121.49;Menara Oriental Pearl~🗼~31.2397~121.4998
+Xian|34.34|108.94|Ujung Jalur Sutra dan rumah tentara terakota.|Pasukan Terakota~🗿~34.3848~109.2785
+Hong Kong|22.32|114.17|Pelabuhan padat dengan gedung pencakar langit.|Victoria Peak~⛰️~22.2759~114.1455`);
+E('Afrika','Kenya',`Nairobi|-1.29|36.82|Kota safari di tepi taman nasional.|Taman Nasional Nairobi~🦁~-1.3733~36.8586`);
+E('Afrika','Tanzania',`Zanzibar|-6.16|39.19|Pulau rempah dengan kota batu bersejarah.|Stone Town~🏘️~-6.1659~39.1925
+Moshi|-3.35|37.34|Kaki gunung tertinggi Afrika.|Gunung Kilimanjaro~🏔️~-3.0674~37.3556`);
+E('Afrika','Ethiopia',`Addis Ababa|9.03|38.74|Ibu kota Ethiopia, markas Uni Afrika.|Museum Nasional Ethiopia~🏛️~9.0306~38.7612`);
+E('Afrika','Nigeria',`Lagos|6.52|3.38|Megakota pantai terbesar Afrika.|Galeri Seni Nike~🎨~6.432~3.456`);
+E('Afrika','Senegal',`Dakar|14.72|-17.47|Titik paling barat Afrika.|Monumen Renaisans Afrika~🗽~14.7203~-17.493`);
+E('Afrika','Tunisia',`Tunis|36.81|10.18|Kota dengan reruntuhan Kartago kuno.|Reruntuhan Kartago~🏛️~36.8528~10.3233`);
+E('Afrika','Mesir',`Kairo|30.04|31.24|Kota seribu menara dan piramida.|Piramida Giza~🔺~29.9792~31.1342;Sphinx~🗿~29.9753~31.1376
+Luxor|25.7|32.64|Museum terbuka terbesar dunia.|Kuil Karnak~🏛️~25.7188~32.6573
+Aswan|24.09|32.9|Kota Sungai Nil di selatan Mesir.|Kuil Philae~🏛️~24.0256~32.8845`);
+E('Afrika','Afrika Selatan',`Cape Town|-33.92|18.42|Kota di kaki gunung meja.|Table Mountain~⛰️~-33.9628~18.4098
+Johannesburg|-26.2|28.05|Kota emas dan pusat bisnis Afrika Selatan.|Museum Apartheid~🏛️~-26.2379~28.0108`);
+E('Afrika','Maroko',`Marrakesh|31.63|-8|Kota merah dengan pasar dan alun-alun hidup.|Jemaa el-Fnaa~🏪~31.6258~-7.9891
+Fes|34.03|-5|Kota medina tertua dan terbesar dunia.|Fes el-Bali~🏘️~34.065~-4.973`);
+E('Eropa','Prancis',`Paris|48.86|2.35|Kota cahaya dan cinta.|Menara Eiffel~🗼~48.8584~2.2945;Museum Louvre~🏛️~48.8606~2.3376
+Nice|43.7|7.26|Kota Riviera di tepi Laut Tengah.|Promenade des Anglais~🏖️~43.695~7.265
+Lyon|45.76|4.84|Ibu kota kuliner Prancis.|Basilika Fourviere~⛪~45.7622~4.8227
+Marseille|43.3|5.37|Kota pelabuhan tertua Prancis.|Notre-Dame de la Garde~⛪~43.284~5.371`);
+E('Eropa','Italia',`Roma|41.9|12.5|Kota abadi dengan peninggalan kekaisaran.|Colosseum~🏟️~41.8902~12.4922;Air Mancur Trevi~⛲~41.9009~12.4833
+Venesia|45.44|12.32|Kota kanal di atas laguna.|Basilika San Marco~⛪~45.4345~12.3397;Jembatan Rialto~🌉~45.438~12.3359
+Florence|43.77|11.26|Pusat Renaisans Italia.|Katedral Duomo~⛪~43.7731~11.256
+Milan|45.46|9.19|Ibu kota mode dan desain.|Duomo Milan~⛪~45.4642~9.1916
+Napoli|40.85|14.27|Kota pizza di kaki Vesuvius.|Pompeii~🏛️~40.751~14.4869`);
+E('Eropa','Inggris',`London|51.51|-0.13|Ibu kota Inggris di tepi Thames.|Big Ben~🕰️~51.5007~-0.1246;Tower Bridge~🌉~51.5055~-0.0754
+Edinburgh|55.95|-3.19|Ibu kota Skotlandia dengan kastil di bukit.|Kastil Edinburgh~🏰~55.9486~-3.1999
+Manchester|53.48|-2.24|Kota industri dan sepak bola.|Stadion Old Trafford~🏟️~53.4631~-2.2913`);
+E('Eropa','Spanyol',`Barcelona|41.39|2.17|Kota Gaudi di tepi laut.|Sagrada Familia~⛪~41.4036~2.1744;Park Guell~🌳~41.4145~2.1527
+Madrid|40.42|-3.7|Ibu kota Spanyol.|Istana Kerajaan Madrid~🏰~40.418~-3.7143
+Sevilla|37.39|-5.98|Kota flamenco di Andalusia.|Alcazar Sevilla~🏰~37.3836~-5.9904`);
+E('Eropa','Jerman',`Berlin|52.52|13.4|Ibu kota Jerman dengan sejarah dinding.|Gerbang Brandenburg~🏛️~52.5163~13.3777
+Munich|48.14|11.58|Kota Bavaria dan festival bir.|Marienplatz~🏛️~48.1374~11.5755`);
+E('Eropa','Belanda',`Amsterdam|52.37|4.9|Kota kanal dan sepeda.|Museum Rijks~🎨~52.36~4.8852;Rumah Anne Frank~🏠~52.3752~4.884`);
+E('Eropa','Belgia',`Brussel|50.85|4.35|Ibu kota Uni Eropa.|Grand Place~🏛️~50.8467~4.3525`);
+E('Eropa','Swiss',`Zurich|47.38|8.54|Kota keuangan di tepi danau.|Danau Zurich~🏞️~47.356~8.543
+Interlaken|46.69|7.86|Gerbang Pegunungan Alpen.|Jungfraujoch~🏔️~46.5475~7.9854`);
+E('Eropa','Austria',`Wina|48.21|16.37|Kota musik klasik dan istana.|Istana Schonbrunn~🏰~48.1845~16.3122`);
+E('Eropa','Ceko',`Praha|50.08|14.44|Kota seratus menara.|Jembatan Charles~🌉~50.0865~14.4114`);
+E('Eropa','Hungaria',`Budapest|47.5|19.04|Mutiara di tepi Sungai Danube.|Gedung Parlemen Hungaria~🏛️~47.5071~19.0457`);
+E('Eropa','Polandia',`Krakow|50.06|19.94|Kota kerajaan lama Polandia.|Kastil Wawel~🏰~50.054~19.9352`);
+E('Eropa','Portugal',`Lisbon|38.72|-9.14|Kota tujuh bukit dan trem kuning.|Menara Belem~🗼~38.6916~-9.216
+Porto|41.15|-8.61|Kota anggur port di tepi Sungai Douro.|Menara Clerigos~🗼~41.1458~-8.614`);
+E('Eropa','Yunani',`Athena|37.98|23.73|Tempat lahir demokrasi.|Acropolis~🏛️~37.9715~23.7257
+Santorini|36.39|25.46|Pulau vulkanik dengan rumah putih.|Desa Oia~🏘️~36.4618~25.3753`);
+E('Eropa','Rusia',`Moskow|55.75|37.62|Ibu kota Rusia dengan kremlin.|Lapangan Merah~🏛️~55.7539~37.6208
+Saint Petersburg|59.93|30.34|Kota tsar di tepi Sungai Neva.|Museum Hermitage~🏛️~59.9398~30.3146`);
+E('Eropa','Norwegia',`Oslo|59.91|10.75|Ibu kota Norwegia di tepi fjord.|Opera Oslo~🎭~59.9075~10.7528`);
+E('Eropa','Swedia',`Stockholm|59.33|18.07|Kota di atas pulau-pulau.|Gamla Stan~🏘️~59.325~18.071`);
+E('Eropa','Denmark',`Kopenhagen|55.68|12.57|Kota sepeda dan pelabuhan berwarna.|Nyhavn~⚓~55.6798~12.591`);
+E('Eropa','Islandia',`Reykjavik|64.15|-21.94|Ibu kota paling utara dunia.|Hallgrimskirkja~⛪~64.1417~-21.9266`);
+E('Eropa','Irlandia',`Dublin|53.35|-6.26|Kota sastra dan pub.|Trinity College~🏛️~53.3438~-6.2546`);
+E('Eropa','Kroasia',`Dubrovnik|42.65|18.09|Mutiara Laut Adriatik.|Tembok Kota Dubrovnik~🧱~42.641~18.11`);
+E('Amerika Utara','Amerika Serikat',`New York|40.71|-74|Kota yang tak pernah tidur.|Patung Liberty~🗽~40.6892~-74.0445
+Los Angeles|34.05|-118.24|Kota film dan pantai California.|Hollywood Sign~🎬~34.1341~-118.3215
+San Francisco|37.77|-122.42|Kota teluk dengan jembatan merah.|Golden Gate Bridge~🌉~37.8199~-122.4783
+Chicago|41.88|-87.63|Kota angin dan arsitektur.|Cloud Gate~🫘~41.8827~-87.6233
+Las Vegas|36.17|-115.14|Kota hiburan di tengah gurun.|The Strip~🎰~36.1147~-115.1728
+Washington DC|38.9|-77.04|Ibu kota Amerika Serikat.|Capitol AS~🏛️~38.8899~-77.0091
+Miami|25.76|-80.19|Kota pantai Florida.|South Beach~🏖️~25.7826~-80.1341
+Honolulu|21.31|-157.86|Pusat Pulau Hawaii.|Diamond Head~🌋~21.262~-157.8056
+Grand Canyon|36.1|-112.11|Ngarai raksasa di Arizona.|South Rim~🏜️~36.0544~-112.1401`);
+E('Amerika Utara','Kanada',`Vancouver|49.28|-123.12|Kota pantai di antara gunung.|Stanley Park~🌲~49.3017~-123.1417
+Montreal|45.5|-73.57|Kota berbahasa Prancis di Amerika.|Basilika Notre-Dame Montreal~⛪~45.5045~-73.5566
+Banff|51.18|-115.57|Kota Pegunungan Rocky.|Danau Louise~🏞️~51.4254~-116.1773`);
+E('Amerika Utara','Meksiko',`Cancun|21.16|-86.85|Resor pantai karibia dekat situs Maya.|Chichen Itza~🛕~20.6843~-88.5678`);
+E('Amerika Utara','Kuba',`Havana|23.11|-82.37|Kota mobil klasik dan musik.|Malecon~🌊~23.145~-82.365`);
+E('Amerika Utara','Panama',`Panama City|8.98|-79.52|Kota di mulut Terusan Panama.|Terusan Panama Miraflores~🚢~8.9961~-79.5897`);
+E('Amerika Selatan','Brasil',`Sao Paulo|-23.55|-46.63|Megakota terbesar Amerika Selatan.|Avenida Paulista~🏙️~-23.5614~-46.6559
+Foz do Iguacu|-25.55|-54.58|Kota dekat air terjun raksasa.|Air Terjun Iguazu~💦~-25.6953~-54.4367
+Salvador|-12.97|-38.5|Kota Afro-Brasil yang berwarna.|Pelourinho~🏘️~-12.9714~-38.5124`);
+E('Amerika Selatan','Peru',`Lima|-12.05|-77.04|Ibu kota Peru di tebing pantai.|Plaza Mayor Lima~🏛️~-12.0464~-77.03`);
+E('Amerika Selatan','Kolombia',`Bogota|4.71|-74.07|Ibu kota di dataran tinggi Andes.|Monserrate~⛰️~4.6058~-74.056
+Cartagena|10.39|-75.48|Kota benteng Karibia.|Kota Tua Cartagena~🏘️~10.4236~-75.551`);
+E('Amerika Selatan','Chile',`Santiago|-33.45|-70.67|Ibu kota Chile di kaki Andes.|Cerro San Cristobal~⛰️~-33.4256~-70.6302`);
+E('Amerika Selatan','Bolivia',`La Paz|-16.5|-68.15|Ibu kota tertinggi dunia.|Plaza Murillo~🏛️~-16.4957~-68.1336
+Uyuni|-20.46|-66.82|Gerbang dataran garam terbesar dunia.|Salar de Uyuni~🧂~-20.1338~-67.4891`);
+E('Amerika Selatan','Ekuador',`Quito|-0.18|-78.47|Kota tua di garis khatulistiwa.|Kota Tua Quito~🏘️~-0.22~-78.5125`);
+E('Amerika Selatan','Argentina',`Buenos Aires|-34.6|-58.38|Kota tango dan boulevard lebar.|Obelisco~🗼~-34.6037~-58.3816
+El Calafate|-50.34|-72.27|Gerbang menuju gletser Patagonia.|Glasier Perito Moreno~🧊~-50.4967~-73.137
+Ushuaia|-54.8|-68.3|Kota paling selatan dunia.|Taman Nasional Tierra del Fuego~🌲~-54.8333~-68.5333`);
+E('Oseania','Australia',`Sydney|-33.87|151.21|Kota pelabuhan dengan arsitektur ikonis.|Sydney Opera House~🎭~-33.8568~151.2153
+Melbourne|-37.81|144.96|Ibu kota budaya Australia.|Federation Square~🏛️~-37.818~144.9691
+Brisbane|-27.47|153.03|Kota sungai di Queensland.|Southbank Brisbane~🌳~-27.4748~153.021
+Perth|-31.95|115.86|Kota paling terpencil di barat.|Kings Park~🌳~-31.961~115.831
+Cairns|-16.92|145.77|Gerbang Great Barrier Reef.|Great Barrier Reef~🐠~-16.75~146
+Uluru|-25.34|131.04|Monolit merah di jantung gurun.|Uluru~🪨~-25.3444~131.0369
+Canberra|-35.28|149.13|Ibu kota Australia.|Gedung Parlemen Australia~🏛️~-35.3081~149.1245`);
+E('Oseania','Selandia Baru',`Queenstown|-45.03|168.66|Ibu kota petualangan di tepi danau.|Skyline Queenstown~🚡~-45.0272~168.659
+Wellington|-41.29|174.78|Ibu kota Selandia Baru.|Museum Te Papa~🏛️~-41.2905~174.7822
+Rotorua|-38.14|176.25|Kota geotermal dan budaya Maori.|Wai-O-Tapu~♨️~-38.357~176.366`);
+E('Oseania','Fiji',`Nadi|-17.8|177.42|Pintu gerbang pulau tropis Fiji.|Pulau Mamanuca~🏝️~-17.65~177.1`);
+E('Oseania','Polinesia Prancis',`Papeete|-17.54|-149.57|Ibu kota Tahiti.|Teahupoo~🌊~-17.87~-149.26`);
+})();
+const C=[];D.forEach((b,bi)=>b.c.forEach(c=>c.k.forEach(k=>C.push({id:k.n,n:k.n,co:c.n,bi,la:k.la,lo:k.lo,d:k.d,l:k.l.map(x=>({id:k.n+'|'+x[0],n:x[0],ic:x[1],la:x[2],lo:x[3],city:k.n}))}))));
+const CM={};C.forEach(c=>CM[c.id]=c);const LM={};C.forEach(c=>c.l.forEach(l=>LM[l.id]=l));
+const LAND=[[[-168,66],[-140,70],[-95,72],[-80,73],[-62,60],[-55,50],[-70,43],[-76,35],[-81,25],[-97,26],[-97,18],[-88,15],[-80,8],[-92,14],[-105,20],[-118,32],[-124,40],[-125,49],[-135,58],[-150,60],[-165,60]],[[-55,60],[-45,60],[-20,70],[-20,82],[-60,82],[-70,76]],[[-80,8],[-72,12],[-60,10],[-50,0],[-35,-6],[-40,-22],[-48,-28],[-58,-38],[-65,-42],[-68,-52],[-72,-54],[-75,-45],[-72,-30],[-70,-18],[-81,-6]],[[-10,36],[-9,43],[-2,48],[-5,50],[5,53],[8,57],[10,59],[5,62],[15,69],[28,71],[40,68],[40,55],[30,45],[28,41],[22,37],[12,38],[3,43]],[[-17,21],[-10,32],[0,36],[10,37],[20,32],[32,31],[34,28],[43,12],[51,12],[40,-3],[40,-15],[35,-25],[27,-34],[18,-34],[12,-18],[8,-1],[9,4],[-8,4],[-17,14]],[[28,41],[36,36],[35,28],[43,13],[52,16],[58,22],[67,25],[73,18],[77,8],[80,15],[88,22],[92,20],[98,16],[100,3],[104,1],[108,12],[107,21],[122,30],[122,40],[128,36],[130,43],[142,52],[160,58],[180,66],[170,70],[140,73],[110,77],[70,73],[60,69],[40,68],[40,55]],[[114,-22],[122,-18],[130,-12],[137,-12],[142,-11],[146,-19],[153,-26],[150,-37],[140,-38],[131,-31],[115,-34]],[[95.3,5.6],[97.5,5.2],[100.4,3.3],[103.5,1],[104.5,-1.5],[106,-3.2],[106,-5.9],[104.6,-5.9],[102.3,-4],[100.3,-1.2],[98.7,1.6],[96.2,3.3]],[[105.2,-6.8],[106,-5.9],[108.5,-6.4],[110.4,-6.9],[112.7,-6.9],[114.4,-7.8],[114.4,-8.7],[111.5,-8.3],[108.5,-7.8],[106,-7.4]],[[114.4,-8.1],[115.7,-8.1],[115.7,-8.8],[114.6,-8.8]],[[115.9,-8.3],[116.7,-8.3],[116.7,-9],[115.9,-8.9]],[[116.8,-8.3],[119.1,-8.4],[119,-9],[116.9,-9]],[[119.8,-8.4],[122.8,-8.1],[123,-8.7],[120,-8.9]],[[119.2,-9.5],[120.9,-9.5],[120.7,-10.3],[119.4,-10.2]],[[123.5,-9.2],[125.1,-8.5],[127,-8.4],[127,-9.3],[124,-10.2]],[[108.9,1.8],[109.7,2],[111,1.7],[113,3.2],[115.6,5],[117.7,6.9],[119.2,5.3],[118.1,3.2],[117.7,1],[117.5,-0.8],[116.5,-2.6],[116.2,-4],[114.5,-3.7],[111.7,-3.2],[110.2,-2.9],[109.1,-1.3],[108.9,0]],[[119.8,0.9],[120.5,1.2],[123.2,1],[125.2,1.7],[124.6,0.4],[122,0.4],[121.5,-0.9],[123.2,-0.8],[122.8,-1.9],[121.2,-1.3],[121.8,-2.9],[122.8,-4.3],[122,-5.3],[120.5,-4.8],[120.4,-3],[119.3,-3.6],[119.5,-5.6],[118.9,-3],[119.8,-0.2]],[[131,-0.8],[132.9,-0.4],[134.3,-0.9],[135,-3.3],[137.8,-1.5],[141,-2.6],[145,-4.5],[148,-6],[150.5,-10.5],[147,-10.2],[143.5,-8.5],[141,-9.1],[139,-8.2],[137.8,-8.4],[138,-7],[135,-4.3],[133,-4],[132.6,-2.8],[131.2,-1.6]],[[127.4,2],[128.7,1.5],[128.2,0.3],[128.6,-0.8],[127.8,-0.6],[127.6,0.7]],[[128,-3],[130.8,-3],[130.5,-3.6],[128.2,-3.5]],[[126.5,-3.2],[127.4,-3.3],[127.2,-3.9],[126.5,-3.7]],[[120.5,18.4],[122.2,18.4],[122.2,16],[124,13],[122.5,13.5],[120.7,14],[120,16]],[[122,11.5],[125,12],[125,10],[123,9.5]],[[122.2,8],[125.5,9.8],[126.5,7.5],[125.5,5.9],[124,6.5],[122.5,7.3]],[[79.8,9.5],[81.8,7.5],[81,6],[80,6],[79.8,7.5]],[[44,-25],[47,-25],[50,-15],[49,-12],[44,-17]],[[172.8,-34.5],[178.5,-37.7],[175.5,-41.5],[174.5,-39],[173.5,-36]],[[172.7,-40.5],[174.3,-41.7],[170.5,-46.5],[166.5,-46],[168.5,-43.5]],[[-24,65.5],[-19,66.5],[-14,65],[-19,63.4],[-22,64]],[[-85,22],[-80,23],[-74,20],[-77,20],[-81,22.2]],[[130,31],[135,34],[141,37],[142,42],[140,41],[131,34]],[[-5,50],[1,51],[-2,57],[-5,58],[-6,54]],[[-180,-70],[180,-70],[180,-90],[-180,-90]]]
+.map(p=>p.map(q=>(q[0]+180)+','+(90-q[1])).join(' '));
+let S={tab:'peta',f:'all',sel:'Jakarta',nav:[],sv:[],sr:[],st:'p',q:'',a:'Jakarta|Monas',b:'Bandung|Gedung Sate',m:'walk'};
+try{const j=JSON.parse(localStorage.getItem('atlas')||'{}');S.sv=j.sv||[];S.sr=j.sr||[]}catch(e){}
+function persist(){try{localStorage.setItem('atlas',JSON.stringify({sv:S.sv,sr:S.sr}))}catch(e){}}
+let V=[0,-36,360],DR=0;
+const cl=()=>{V[2]=Math.max(25,Math.min(360,V[2]));const h=V[2]*.7;V[0]=Math.max(-30,Math.min(360-V[2]+30,V[0]));V[1]=Math.max(-40,Math.min(180-h+40,V[1]))};
+function focus(lo,la,w){V=[lo+180-w/2,90-la-w*.35,w];cl()}
+function zoom(f){const cx=V[0]+V[2]/2,cy=V[1]+V[2]*.35;V[2]*=f;cl();V[0]=cx-V[2]/2;V[1]=cy-V[2]*.35;cl();render()}
+function hav(a,b){const r=x=>x*Math.PI/180,R=6371,dl=r(b.la-a.la),dn=r(b.lo-a.lo),h=Math.sin(dl/2)**2+Math.cos(r(a.la))*Math.cos(r(b.la))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function fit(pts){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;pts.forEach(p=>{const x=p.lo+180,y=90-p.la;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});const w=Math.max((x1-x0)*1.6,(y1-y0)*1.6/.7,.05);return [(x0+x1)/2-w/2,(y0+y1)/2-w*.35,w]}
+function map(vb,mk,line,id){const[x,y,w]=vb,s=w/360;let o=`<svg id="${id||''}" viewBox="${x} ${y} ${w} ${w*.7}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Peta dunia ilustratif"><rect x="-400" y="-400" width="1200" height="1000" fill="var(--sea)"/>`;
+for(let i=0;i<=360;i+=30)o+=`<line x1="${i}" y1="-400" x2="${i}" y2="600" stroke="var(--ln)" stroke-width="${.25*s}" opacity=".5"/>`;
+for(let i=0;i<=180;i+=30)o+=`<line x1="-400" y1="${i}" x2="800" y2="${i}" stroke="var(--ln)" stroke-width="${.25*s}" opacity=".5"/>`;
+LAND.forEach(p=>o+=`<polygon points="${p}" fill="var(--land)" stroke="var(--ln)" stroke-width="${.5*s}"/>`);
+if(line)o+=`<line x1="${line[0]}" y1="${line[1]}" x2="${line[2]}" y2="${line[3]}" stroke="var(--pr)" stroke-width="${2.2*s}" stroke-dasharray="${5*s} ${3*s}" stroke-linecap="round"/>`;
+mk.forEach(m=>{const cx=m.lo+180,cy=90-m.la,on=m.on;o+=`<g data-m="${m.id}" style="cursor:pointer"><circle cx="${cx}" cy="${cy}" r="${(on?9:7)*s}" fill="${on?'var(--pl)':'var(--card)'}" stroke="var(--pr)" stroke-width="${(on?2:1.2)*s}"/><text x="${cx}" y="${cy}" font-size="${(on?10:8)*s}" text-anchor="middle" dominant-baseline="central">${m.ic}</text>${w<=130||m.lab?`<text x="${cx}" y="${cy+12*s}" font-size="${7*s}" text-anchor="middle" fill="var(--tx)" stroke="var(--card)" stroke-width="${2*s}" paint-order="stroke">${m.t||''}</text>`:''}</g>`});
+return o+'</svg>'}
+function mk(id){const[t,v]=[id[0],id.slice(2)];if(t==='k'){const z=D[+v].z;focus(z[0],z[1],z[2])}else{const c=t==='c'?CM[v]:CM[LM[v].city];S.sel=c.id;if(V[2]>200)focus(c.lo,c.la,60)}render()}
+function bind(){const s=document.getElementById('map');if(!s)return;let d=null;
+s.onpointerdown=e=>{d={x:e.clientX,y:e.clientY,vx:V[0],vy:V[1],m:0}};
+s.onpointermove=e=>{if(!d)return;const r=s.getBoundingClientRect(),k=V[2]/r.width,dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.m=1;if(d.m){V[0]=d.vx-dx*k;V[1]=d.vy-dy*k;cl();s.setAttribute('viewBox',V[0]+' '+V[1]+' '+V[2]+' '+V[2]*.7)}};
+s.onpointerup=s.onpointerleave=()=>{DR=d&&d.m;d=null};
+s.onclick=e=>{if(DR){DR=0;return}const g=e.target.closest('[data-m]');if(g)mk(g.dataset.m)}}
+const sv=id=>S.sv.includes(id);
+function tog(id){S.sv=sv(id)?S.sv.filter(x=>x!==id):[...S.sv,id];persist();render()}
+function tab(t){S.tab=t;if(t==='jelajah')S.nav=[];render();document.getElementById('v').scrollTop=0}
+function openCity(id){S.sel=id;S.tab='jelajah';S.nav=['k',id];render();document.getElementById('v').scrollTop=0}
+function back(){S.nav=S.nav[0]==='k'&&S.from!==undefined?[]:(S.nav[0]==='k'?['c',D[CM[S.nav[1]].bi].n]:[]);render()}
+function search(q){S.q=q;const r=document.getElementById('res');const t=q.trim().toLowerCase();if(!t){r.innerHTML='';return}
+const h=[];C.forEach(c=>{if((c.n+c.co+D[c.bi].n).toLowerCase().includes(t))h.push(`<div class="card"><button class="row" onclick="focusCity('${c.id}')"><div class="ic">📍</div><div><b>${c.n}</b><span>${c.co} · ${D[c.bi].n}</span></div></button></div>`);c.l.forEach(l=>{if(l.n.toLowerCase().includes(t))h.push(`<div class="card"><button class="row" onclick="focusCity('${c.id}')"><div class="ic">${l.ic}</div><div><b>${l.n}</b><span>${c.n}, ${c.co}</span></div></button></div>`)})});
+r.innerHTML=h.slice(0,6).join('')||'<p class="cap">Tidak ditemukan.</p>'}
+function focusCity(id){S.q='';S.sel=id;const c=CM[id];focus(c.lo,c.la,50);render()}
+function head(t,sub,bk){return `<div class="top">${bk?'<button class="ib" aria-label="Kembali" onclick="back()">←</button>':''}<div><small>${sub}</small><h1>${t}</h1></div><div class="sp"></div></div>`}
+function vPeta(){const mkrs=[];
+if(S.f==='all')C.forEach(c=>mkrs.push({id:'c:'+c.id,la:c.la,lo:c.lo,ic:'📍',t:c.n,on:c.id===S.sel}));
+if(S.f==='lm')C.forEach(c=>c.l.forEach(l=>mkrs.push({id:'l:'+l.id,la:l.la,lo:l.lo,ic:l.ic,t:l.n,on:c.id===S.sel})));
+if(S.f==='bn')D.forEach((b,i)=>mkrs.push({id:'k:'+i,la:b.z[1],lo:b.z[0],ic:b.e,t:b.n,lab:1}));
+const c=CM[S.sel];
+return head('Atlas Dunia','DUNIA DI UJUNG JARI')+`<input id="q" placeholder="Cari negara, kota, atau landmark" value="${S.q}" oninput="search(this.value)" onfocus="search(this.value)" aria-label="Cari"><div id="res" class="res"></div>
+<div class="chips">${[['all','📍 Kota'],['lm','🏛️ Landmark'],['bn','🌐 Benua']].map(x=>`<button class="chip ${S.f===x[0]?'on':''}" onclick="S.f='${x[0]}';render()">${x[1]}</button>`).join('')}</div>
+<div class="mapw">${map(V,mkrs,null,'map')}<div class="ctl"><button aria-label="Fokus Indonesia" onclick="focus(118,-2,75);render()" style="font-size:12px;font-weight:700">ID</button><button aria-label="Perbesar" onclick="zoom(.5)">+</button><button aria-label="Perkecil" onclick="zoom(2)">−</button><button aria-label="Tampilan dunia" onclick="V=[0,-36,360];render()">◎</button></div></div>
+<p class="cap">Peta ilustratif sederhana. Geser untuk menjelajah, ketuk penanda untuk memilih.</p>
+<h2>Mulai dari ${c.n}<a onclick="tab('jelajah')">Lihat benua →</a></h2><div class="card"><div class="row" style="cursor:default"><div class="ic">${c.l[0].ic}</div><div><small style="color:var(--pr);font-weight:700;font-size:10px">${c.co.toUpperCase()} · ${D[c.bi].n.toUpperCase()}</small><b style="font-size:18px">${c.n}</b><span>${c.d}</span></div></div>
+<div class="btns"><button class="btn" onclick="openCity('${c.id}')">Lihat kota</button><button class="btn sec" onclick="tog('c:${c.id}')">${sv('c:'+c.id)?'★ Tersimpan':'☆ Simpan'}</button></div></div>`}
+function vJelajah(){const n=S.nav;
+if(!n.length)return head('Jelajahi benua','7 BENUA, BANYAK CERITA')+`<p class="cap" style="font-size:13px">Dari benua ke negara, lalu temukan kota dan landmark khasnya.</p>`+D.map(b=>`<div class="card"><button class="row" onclick="S.nav=['c','${b.n}'];render()"><div class="ic">${b.e}</div><div><b>${b.n}</b><span>${b.c.map(c=>c.n).join(' · ')}</span></div><i>›</i></button></div>`).join('')+`<p class="cap">Destinasi di atas adalah contoh representatif. Antarktika dijelajahi melalui lokasi riset.</p>`;
+if(n[0]==='c'){const b=D.find(x=>x.n===n[1]);return head(b.n,'JELAJAHI BENUA',1)+`<div class="mapw">${map(fit(C.filter(c=>D[c.bi]===b)),C.filter(c=>D[c.bi]===b).map(c=>({id:'c:'+c.id,la:c.la,lo:c.lo,ic:'📍',t:c.n,lab:1})),null)}</div>`+b.c.map(c=>`<h2>${c.n}<span class="cap">${c.k.length} kota</span></h2>`+c.k.map(k=>`<div class="card"><button class="row" onclick="openCity('${k.n}')"><div class="ic">${k.l[0][1]}</div><div><b>${k.n}</b><span>${k.l.map(l=>l[0]).join(' · ')}</span></div><i>›</i></button></div>`).join('')).join('')}
+const c=CM[n[1]];return head(c.n,D[c.bi].n.toUpperCase()+' / '+c.co.toUpperCase(),1)+`<div class="mapw">${map(fit(c.l),c.l.map(l=>({id:'l:'+l.id,la:l.la,lo:l.lo,ic:l.ic,t:l.n,lab:1})),null)}</div><p>${c.d}</p><div class="btns" style="margin:0 0 6px"><button class="btn" onclick="S.a='${c.l[0].id}';S.b='${(c.l[1]||c.l[0]).id}';tab('rute')">🧭 Buat rute</button><button class="btn sec" onclick="tog('c:${c.id}')">${sv('c:'+c.id)?'★ Tersimpan':'☆ Simpan'}</button></div><h2>Landmark ikonis<span class="cap">${c.l.length} pilihan</span></h2><div class="grid">${c.l.map(l=>`<div class="lm"><button aria-label="Simpan ${l.n}" onclick="tog('l:${l.id}')">${sv('l:'+l.id)?'★':'☆'}</button><div>${l.ic}</div><b>${l.n}</b></div>`).join('')}</div><p class="cap">Ikon menandai landmark pilihan. Tampilan peta ilustratif, bukan peta langsung.</p>`}
+function vRute(){const A=LM[S.a],B=LM[S.b],d=hav(A,B),far=d>150;
+const opt=C.map(c=>`<optgroup label="${c.n}, ${c.co}">${c.l.map(l=>`<option value="${l.id}" %s>${l.ic} ${l.n}</option>`).join('')}</optgroup>`).join('');
+const sel=cur=>opt.replace(/%s/g,'').replace(`value="${cur}"`,`value="${cur}" selected`);
+const spd={walk:5,car:40,bus:25},ic={walk:'🚶 Jalan kaki',car:'🚗 Mobil',bus:'🚌 Transit'};
+const t=far?d/800*60+60:d/spd[S.m]*60;const tt=t>=60?(t/60).toFixed(1)+' jam':Math.max(1,Math.round(t))+' menit';
+const rid=S.a+'>'+S.b;
+return head('Rencanakan rute','JARAK & ESTIMASI')+`<div class="card"><label class="cap">DARI</label><select onchange="S.a=this.value;render()">${sel(S.a)}</select><label class="cap">KE</label><select onchange="S.b=this.value;render()">${sel(S.b)}</select><div class="btns"><button class="btn sec" onclick="const t=S.a;S.a=S.b;S.b=t;render()">⇅ Tukar</button></div></div>
+<div class="chips">${Object.keys(ic).map(k=>`<button class="chip ${S.m===k?'on':''}" onclick="S.m='${k}';render()">${ic[k]}</button>`).join('')}</div>
+<div class="mapw">${map(fit([A,B]),[{id:'l:'+A.id,la:A.la,lo:A.lo,ic:A.ic,t:A.n,lab:1},{id:'l:'+B.id,la:B.la,lo:B.lo,ic:B.ic,t:B.n,lab:1}],[A.lo+180,90-A.la,B.lo+180,90-B.la])}</div>
+<div class="sum"><big>${far?'✈️ ':''}${tt}</big><small>≈ ${d<10?d.toFixed(1):Math.round(d)} km · jarak garis lurus${far?' · disarankan pesawat':''}</small></div><p class="cap">Estimasi ilustratif dari jarak garis lurus, bukan data lalu lintas langsung.</p>
+<h2>Gambaran perjalanan</h2><div class="step">📍 Mulai di ${A.n}</div><div class="step">➡️ ${far?'Terbang':'Menuju'} ke arah tujuan sejauh ≈ ${Math.round(d)} km</div><div class="step">🏁 Tiba di ${B.n}</div>
+<div class="btns"><button class="btn" onclick="S.sr=S.sr.includes('${rid}')?S.sr:[...S.sr,'${rid}'];persist();render()">${S.sr.includes(rid)?'★ Rute tersimpan':'🔖 Simpan rencana rute'}</button></div>`}
+function vSimpan(){const pl=S.sv.map(id=>{const t=id[0],v=id.slice(2);return t==='c'?{id,ic:'📍',n:CM[v].n,s:CM[v].co+' · '+D[CM[v].bi].n,go:`openCity('${v}')`}:{id,ic:LM[v].ic,n:LM[v].n,s:LM[v].city+' · '+CM[LM[v].city].co,go:`openCity('${LM[v].city}')`}});
+return head('Tempat tersimpan','KOLEKSI PERJALANANMU')+`<div class="chips"><button class="chip ${S.st==='p'?'on':''}" onclick="S.st='p';render()">Tempat · ${pl.length}</button><button class="chip ${S.st==='r'?'on':''}" onclick="S.st='r';render()">Rute · ${S.sr.length}</button></div>`+
+(S.st==='p'?(pl.length?pl.map(p=>`<div class="card"><div class="row"><div class="ic" onclick="${p.go}">${p.ic}</div><div onclick="${p.go}"><b>${p.n}</b><span>${p.s}</span></div><i onclick="tog('${p.id}')" role="button" aria-label="Hapus">★</i></div></div>`).join(''):'<p class="empty">Belum ada tempat. Ketuk ☆ pada kota atau landmark.</p>'):
+(S.sr.length?S.sr.map(r=>{const[a,b]=r.split('>');return `<div class="card"><div class="row" onclick="S.a='${a}';S.b='${b}';tab('rute')"><div class="ic">🧭</div><div><b>${LM[a].n} → ${LM[b].n}</b><span>${LM[a].city} → ${LM[b].city}</span></div><i>›</i></div></div>`}).join(''):'<p class="empty">Belum ada rute tersimpan.</p>'))}
+function render(){const v=document.getElementById('v');const f={peta:vPeta,jelajah:vJelajah,rute:vRute,simpan:vSimpan}[S.tab];const keep=v.scrollTop;v.innerHTML=f();v.scrollTop=keep;
+document.getElementById('nav').innerHTML=[['peta','🗺️','Peta'],['jelajah','🌐','Jelajahi'],['rute','🧭','Rute'],['simpan','🔖','Tersimpan']].map(x=>`<button ${S.tab===x[0]?'aria-current="page"':''} onclick="tab('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join('');
+if(S.tab==='peta')bind()}
+focus(118,-2,75);render();
+</script><style>
+.sc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin:6px 0}.sc .chip{flex:none;text-align:center;line-height:1.25;padding:6px 11px}.sc .chip small{display:block;font-size:10px;opacity:.85}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}.g3 div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;color:var(--mu)}.g3 b{display:block;color:var(--tx);font-size:14px}
+.bar{height:6px;border-radius:9px;background:var(--pl);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--pr)}
+a.btn{text-decoration:none;text-align:center;display:block}.cmp{display:block;margin:0 auto;width:min(240px,70%)}.nvi{font-size:15px;font-weight:600;margin:8px 0 2px}
+#ts{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 14px;border-radius:99px;font-size:12px;opacity:0;transition:.2s;pointer-events:none;z-index:9}#ts.on{opacity:1}
+nav button{font-size:10px}
+</style>
+<script>
+Object.assign(S,{stops:[],ms:[],p:0,sx:1,u:'km',th:'auto',m:'car',cs:0,hd:null,me:null,w:null});
+try{const j=JSON.parse(localStorage.getItem('atlas')||'{}');S.u=j.u||'km';S.rc=j.rc||[];S.nts=j.nts||{};S.th=j.th||'auto'}catch(e){}
+persist=function(){try{localStorage.setItem('atlas',JSON.stringify({sv:S.sv,sr:S.sr,u:S.u,th:S.th,rc:S.rc,nts:S.nts}))}catch(e){}};
+const aT=()=>{if(S.th==='light'||S.th==='dark')document.documentElement.dataset.theme=S.th;else delete document.documentElement.dataset.theme};
+const rad=x=>x*Math.PI/180,deg=x=>x*180/Math.PI;
+const P=id=>id==='@pin'&&S.pin?{id:'@pin',n:'Pin saya',ic:'📌',la:S.pin.la,lo:S.pin.lo,city:'Pin'}:id==='@me'&&S.me?{id:'@me',n:'Lokasi saya',ic:'📡',la:S.me.la,lo:S.me.lo,city:'GPS'}:(LM[id]||LM['Jakarta|Monas']);
+function brg(a,b){const y=Math.sin(rad(b.lo-a.lo))*Math.cos(rad(b.la)),x=Math.cos(rad(a.la))*Math.sin(rad(b.la))-Math.sin(rad(a.la))*Math.cos(rad(b.la))*Math.cos(rad(b.lo-a.lo));return(deg(Math.atan2(y,x))+360)%360}
+const DIR=['Utara','Timur Laut','Timur','Tenggara','Selatan','Barat Daya','Barat','Barat Laut'],dn=b=>DIR[Math.round(b/45)%8];
+function gc(a,b,n){const d=hav(a,b)/6371;if(d<1e-6)return[a,b];const o=[];for(let i=0;i<=n;i++){const f=i/n,A=Math.sin((1-f)*d)/Math.sin(d),B=Math.sin(f*d)/Math.sin(d),x=A*Math.cos(rad(a.la))*Math.cos(rad(a.lo))+B*Math.cos(rad(b.la))*Math.cos(rad(b.lo)),y=A*Math.cos(rad(a.la))*Math.sin(rad(a.lo))+B*Math.cos(rad(b.la))*Math.sin(rad(b.lo)),z=A*Math.sin(rad(a.la))+B*Math.sin(rad(b.la));o.push({la:deg(Math.atan2(z,Math.hypot(x,y))),lo:deg(Math.atan2(y,x))})}return o}
+const MD={walk:['🚶',5,0,0,0],bike:['🚴',15,0,0,0],moto:['🏍️',40,2000,70,0],car:['🚗',50,4000,170,0],bus:['🚌',35,1200,70,0],train:['🚆',90,900,40,20],plane:['✈️',800,1300,250,120]};
+const tm=(k,d)=>d*(k==='plane'?1:1.25)/MD[k][1]*60+MD[k][4];
+const fd=k=>S.u==='mi'?(k*.621371).toFixed(k*.62<10?1:0)+' mi':(k<10?k.toFixed(1):Math.round(k).toLocaleString('id-ID'))+' km';
+const ft=m=>m<1?'<1 mnt':m<60?Math.round(m)+' mnt':m<2880?Math.floor(m/60)+' j '+Math.floor(m%60)+' mnt':(m/1440).toFixed(1)+' hari';
+const eta=m=>{const t=new Date(Date.now()+m*6e4);return t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+(m>1000?' · '+t.toLocaleDateString('id-ID',{day:'numeric',month:'short'}):'')};
+const dms=(v,p,n)=>{const a=Math.abs(v),d=Math.floor(a),m=Math.floor((a-d)*60),s=((a-d)*60-m)*60;return d+'°'+m+"'"+s.toFixed(1)+'"'+(v>=0?p:n)};
+function toast(t){let e=document.getElementById('ts');if(!e){e=document.createElement('div');e.id='ts';document.body.appendChild(e)}e.textContent=t;e.className='on';clearTimeout(e.t);e.t=setTimeout(()=>e.className='',2200)}
+function cpy(t){try{navigator.clipboard.writeText(t).then(()=>toast('Disalin'),()=>toast('Gagal menyalin'))}catch(e){toast('Gagal menyalin')}}
+function RT(){const I=[S.a,...S.stops,S.b].map(P);let pts=[],legs=[],tot=0;for(let i=0;i<I.length-1;i++){const l=gc(I[i],I[i+1],40),d=hav(I[i],I[i+1]);legs.push(d);tot+=d;pts.push(...(i?l.slice(1):l))}const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+hav(pts[i-1],pts[i]));return{ids:I,pts,legs,tot,cum}}
+function at(R,p){const T=p*R.cum[R.cum.length-1];let i=1;while(i<R.cum.length-1&&R.cum[i]<T)i++;const a=R.pts[i-1],b=R.pts[i],f=Math.min(1,Math.max(0,(T-R.cum[i-1])/((R.cum[i]-R.cum[i-1])||1)));return{la:a.la+(b.la-a.la)*f,lo:a.lo+(b.lo-a.lo)*f,h:brg(a,b)}}
+function pd(pts){let d='',px=null;pts.forEach(p=>{const x=p.lo+180;d+=(px===null||Math.abs(x-px)>180?'M':'L')+x.toFixed(2)+' '+(90-p.la).toFixed(2);px=x});return d}
+function map(vb,mk,line,id,o){o=o||{};const[x,y,w]=vb,s=w/360;
+let h=`<svg id="${id||''}" viewBox="${x} ${y} ${w} ${w*.7}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Peta dunia ilustratif"><rect x="-400" y="-400" width="1200" height="1000" fill="var(--sea)"/>`;
+for(let i=0;i<=360;i+=30)h+=`<line x1="${i}" y1="-400" x2="${i}" y2="600" stroke="var(--ln)" stroke-width="${.25*s}" opacity=".5"/>`;
+for(let i=0;i<=180;i+=30)h+=`<line x1="-400" y1="${i}" x2="800" y2="${i}" stroke="var(--ln)" stroke-width="${.25*s}" opacity=".5"/>`;
+LAND.forEach(p=>h+=`<polygon points="${p}" fill="var(--land)" stroke="var(--ln)" stroke-width="${.5*s}"/>`);
+const pa=(pts,sw,da,op)=>`<path d="${pd(pts)}" fill="none" stroke="var(--pr)" stroke-width="${sw*s}" ${da?`stroke-dasharray="${5*s} ${3*s}"`:''} stroke-linecap="round" stroke-linejoin="round" opacity="${op||1}"/>`;
+if(o.night)h+=`<polygon points="${night()}" fill="#04122a" opacity=".3"/>`;if(o.path)h+=pa(o.path,2,1,.55);if(o.done)h+=pa(o.done,3.2);
+if(o.ms&&o.ms.length){h+=pa(o.ms,2,1);o.ms.forEach(p=>h+=`<circle cx="${p.lo+180}" cy="${90-p.la}" r="${3*s}" fill="var(--pr)" stroke="#fff" stroke-width="${s}"/>`)}
+mk.forEach(m=>{const cx=m.lo+180,cy=90-m.la,on=m.on;h+=`<g data-m="${m.id}" style="cursor:pointer"><circle cx="${cx}" cy="${cy}" r="${(on?9:7)*s}" fill="${on?'var(--pl)':'var(--card)'}" stroke="var(--pr)" stroke-width="${(on?2:1.2)*s}"/><text x="${cx}" y="${cy}" font-size="${(on?10:8)*s}" text-anchor="middle" dominant-baseline="central">${m.ic}</text>${w<=130||m.lab?`<text x="${cx}" y="${cy+12*s}" font-size="${7*s}" text-anchor="middle" fill="var(--tx)" stroke="var(--card)" stroke-width="${2*s}" paint-order="stroke">${m.t||''}</text>`:''}</g>`});
+if(o.pin){const cx=o.pin.lo+180,cy=90-o.pin.la;h+=`<circle cx="${cx}" cy="${cy}" r="${6*s}" fill="#d33" stroke="#fff" stroke-width="${1.5*s}"/><circle cx="${cx}" cy="${cy}" r="${2*s}" fill="#fff"/>`}if(o.me){const cx=o.me.lo+180,cy=90-o.me.la;h+=`<circle cx="${cx}" cy="${cy}" r="${Math.max(6*s,o.me.ac/111e3)}" fill="#2a7de1" opacity=".18"/><circle cx="${cx}" cy="${cy}" r="${4*s}" fill="#2a7de1" stroke="#fff" stroke-width="${1.5*s}"/>`}
+if(o.veh){const cx=o.veh.lo+180,cy=90-o.veh.la;h+=`<circle cx="${cx}" cy="${cy}" r="${8*s}" fill="var(--card)" stroke="var(--pr)" stroke-width="${2*s}"/><text x="${cx}" y="${cy}" font-size="${9*s}" text-anchor="middle" dominant-baseline="central">${o.veh.ic}</text>`}
+return h+'</svg>'}
+const gp=p=>({la:p.coords.latitude,lo:p.coords.longitude,ac:p.coords.accuracy||30,sp:p.coords.speed});
+function loc(cb){if(!navigator.geolocation)return toast('GPS tidak didukung perangkat ini');navigator.geolocation.getCurrentPosition(p=>{S.me=gp(p);S.err='';cb?cb():render()},()=>{S.err='Izin lokasi ditolak atau tidak tersedia di sini.';render()},{enableHighAccuracy:true,timeout:10000})}
+let DRG=0;
+function trk(){if(S.w!=null){navigator.geolocation.clearWatch(S.w);S.w=null;return render()}if(!navigator.geolocation)return toast('GPS tidak didukung');S.w=navigator.geolocation.watchPosition(p=>{S.me=gp(p);if(S.tab==='alat'||(S.tab==='peta'&&!DRG))render()},()=>{S.err='Lokasi tidak tersedia.';render()},{enableHighAccuracy:true});render()}
+function startCmp(){const ab='ondeviceorientationabsolute' in window,h=e=>{const v=e.webkitCompassHeading!=null?e.webkitCompassHeading:e.alpha!=null?360-e.alpha:null;if(v!=null){S.hd=v;const g=document.getElementById('dial');if(g)g.setAttribute('transform','rotate('+(-v)+' 100 100)');const t=document.getElementById('hd');if(t)t.textContent=Math.round(v)+'° '+dn(v)}},go=()=>{addEventListener(ab?'deviceorientationabsolute':'deviceorientation',h,true);S.cs=1;toast('Kompas aktif');render()};
+if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().then(r=>r==='granted'?go():toast('Izin sensor ditolak')).catch(()=>toast('Sensor tidak tersedia'));else if(window.DeviceOrientationEvent)go();else toast('Perangkat tanpa sensor kompas')}
+function rdt(){const mc={lo:V[0]+V[2]/2-180,la:90-(V[1]+V[2]*.35)};return`Pusat ${mc.la.toFixed(2)}°, ${mc.lo.toFixed(2)}° · lebar peta ≈ ${fd(V[2]*111.32*Math.cos(rad(mc.la)))}`}
+function bind(){const s=document.getElementById('map');if(!s)return;const Q=new Map();let d=null,pz=0;
+const up=()=>{s.setAttribute('viewBox',V[0]+' '+V[1]+' '+V[2]+' '+V[2]*.7);const r=document.getElementById('rd');if(r)r.textContent=rdt()};
+s.onpointerdown=e=>{DRG=1;Q.set(e.pointerId,e);if(Q.size===2){const[a,b]=[...Q.values()];pz={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),w:V[2]};d=null}else{d={x:e.clientX,y:e.clientY,vx:V[0],vy:V[1],m:0};clearTimeout(LP);const ev=e;LP=setTimeout(()=>{if(d&&!d.m){DR=1;S.pin=m2g(ev,s);S.sheet='pin';if(navigator.vibrate)navigator.vibrate(30);render()}},550)}};
+s.onpointermove=e=>{if(Q.has(e.pointerId))Q.set(e.pointerId,e);if(pz&&Q.size===2){const[a,b]=[...Q.values()],cx=V[0]+V[2]/2,cy=V[1]+V[2]*.35;V[2]=pz.w*pz.d/Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);cl();V[0]=cx-V[2]/2;V[1]=cy-V[2]*.35;cl();up();DR=1;return}
+if(!d)return;const r=s.getBoundingClientRect(),k=V[2]/r.width,dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.m=1;if(d.m){V[0]=d.vx-dx*k;V[1]=d.vy-dy*k;cl();up()}};
+s.onpointerup=s.onpointercancel=s.onpointerleave=e=>{clearTimeout(LP);Q.delete(e.pointerId);if(Q.size<2)pz=0;DRG=0;DR=(d&&d.m)||DR;d=null;setTimeout(()=>DR=0,80)};
+s.onwheel=e=>{e.preventDefault();zoom(e.deltaY>0?1.25:.8)};
+s.onclick=e=>{if(DR)return;if(S.f==='ms'){const r=s.getBoundingClientRect();S.ms.push({lo:V[0]+(e.clientX-r.left)/r.width*V[2]-180,la:90-(V[1]+(e.clientY-r.top)/r.height*V[2]*.7)});return render()}const g=e.target.closest('[data-m]');if(g)mk(g.dataset.m);else if(S.sheet){S.sheet=null;render()}}}
+function vPeta(){const m=[],c=CM[S.sel];
+if(S.f==='all')C.forEach(x=>m.push({id:'c:'+x.id,la:x.la,lo:x.lo,ic:'📍',t:x.n,on:x.id===S.sel}));
+if(S.f==='lm')C.forEach(x=>x.l.forEach(l=>m.push({id:'l:'+l.id,la:l.la,lo:l.lo,ic:l.ic,t:l.n,on:x.id===S.sel})));
+if(S.f==='bn')D.forEach((b,i)=>m.push({id:'k:'+i,la:b.z[1],lo:b.z[0],ic:b.e,t:b.n,lab:1}));
+if(S.f==='fv')S.sv.forEach(id=>{const v=id.slice(2),o=id[0]==='c'?CM[v]:LM[v];if(o)m.push({id,la:o.la,lo:o.lo,ic:id[0]==='c'?'📍':o.ic,t:o.n,lab:1,on:1})});
+let ms='';if(S.f==='ms'){let t=0;for(let i=1;i<S.ms.length;i++)t+=hav(S.ms[i-1],S.ms[i]);ms=`<div class="card"><b>📏 ${fd(t)}</b>${ar()} <span class="cap">${S.ms.length} titik · ketuk peta untuk menambah</span><div class="btns"><button class="btn sec" onclick="S.ms.pop();render()">↶ Undo</button><button class="btn sec" onclick="S.ms=[];render()">Hapus</button></div></div>`}
+return head('Atlas Dunia','NAVIGASI DI UJUNG JARI')+`<input id="q" placeholder="Cari negara, kota, atau landmark" value="${S.q}" oninput="search(this.value)" onfocus="search(this.value)" aria-label="Cari"><div id="res" class="res"></div>
+<div class="sc">${[['all','📍 Kota'],['lm','🏛️ Landmark'],['bn','🌐 Benua'],['fv','★ Favorit'],['ms','📏 Ukur']].map(x=>`<button class="chip ${S.f===x[0]?'on':''}" onclick="S.f='${x[0]}';render()">${x[1]}</button>`).join('')}</div>
+<div class="mapw">${map(V,m,null,'map',{ms:S.f==='ms'?S.ms:0,me:S.me,pin:S.pin,night:S.nt})}<div class="ctl"><button aria-label="Zoom in" onclick="zoom(.6)">+</button><button aria-label="Zoom out" onclick="zoom(1.6)">−</button><button aria-label="Dunia" onclick="V=[0,-36,360];render()">◎</button><button aria-label="Siang malam" onclick="S.nt=!S.nt;render()">🌓</button><button aria-label="Lokasi saya" onclick="loc(()=>{focus(S.me.lo,S.me.la,20);render()})">📡</button></div></div>
+<p class="cap" id="rd">${rdt()}</p>${ms}
+<h2>Mulai dari ${c.n}<a onclick="tab('jelajah')">Lihat benua →</a></h2><div class="card"><div class="row" style="cursor:default"><div class="ic">${c.l[0].ic}</div><div><small style="color:var(--pr);font-weight:700;font-size:10px">${c.co.toUpperCase()} · ${D[c.bi].n.toUpperCase()}</small><b style="font-size:18px">${c.n}</b><span>${c.d}</span></div></div>
+<div class="btns"><button class="btn" onclick="openCity('${c.id}')">Lihat kota</button><button class="btn sec" onclick="tog('c:${c.id}')">${sv('c:'+c.id)?'★ Tersimpan':'☆ Simpan'}</button><button class="btn sec" style="flex:none" aria-label="Acak" onclick="const z=C[Math.floor(Math.random()*C.length)];focusCity(z.id);toast('🎲 '+z.n)">🎲</button></div></div>`}
+function setR(k,v){S[k]=v;S.p=0;S.run=0;render()}
+const OPT=()=>(S.pin?'<option value="@pin">📌 Pin saya</option>':'')+(S.me?'<option value="@me">📡 Lokasi saya</option>':'')+C.map(c=>`<optgroup label="${c.n}, ${c.co}">${c.l.map(l=>`<option value="${l.id}">${l.ic} ${l.n}</option>`).join('')}</optgroup>`).join('');
+const sl=(cur,k)=>`<select onchange="setR('${k}',this.value)">${OPT().replace(`value="${cur}"`,`value="${cur}" selected`)}</select>`;
+function svR(r){if(!S.sr.includes(r))S.sr.push(r);persist();toast('Rute disimpan');render()}
+function goR(id){S.a=S.me?'@me':CM[S.sel].l[0].id;S.b=id;S.stops=[];tab('rute')}
+let TM=0;
+function nvU(){const e=document.getElementById('nv');if(e)e.innerHTML=nvBox()}
+function nvT(){if(S.p>=1)S.p=0;S.run=!S.run;nvU();clearInterval(TM);if(S.run)TM=setInterval(()=>{if(S.tab!=='rute'||!document.getElementById('nv')){S.run=0;return clearInterval(TM)}S.p=Math.min(1,S.p+.0025*S.sx);if(S.p>=1){S.run=0;clearInterval(TM)}nvU();vc()},100)}
+const _t=tab;tab=function(t){S.run=0;S.p=0;clearInterval(TM);_t(t)};
+function nvBox(){const R=RT(),p=S.p,cur=at(R,p),n=Math.floor(p*(R.pts.length-1)),done=R.pts.slice(0,n+1).concat([cur]),I=R.ids,trav=p*R.tot;let acc=0,k=0;R.legs.forEach((l,i)=>{if(acc+l<trav-1e-6){acc+=l;k=i+1}});const rem=Math.max(0,acc+R.legs[k]-trav),left=R.tot*(1-p);
+const ins=p>=1?`🏁 Anda telah tiba di ${I[I.length-1].n}`:p>0?`⬆️ Lanjut ke ${dn(cur.h)} (${Math.round(cur.h)}°) · ${fd(rem)} lagi ke ${I[k+1].n}`:'Siap berangkat. Tekan Mulai untuk simulasi navigasi.';
+return`<div class="mapw">${map(S.fl&&p>0&&p<1?(w=>[cur.lo+180-w/2,90-cur.la-w*.35,w])(Math.max(.5,Math.min(60,R.tot/111*2.5))):fit(R.pts),I.map((x,i)=>({id:'x:'+i,la:x.la,lo:x.lo,ic:i?i===I.length-1?'🏁':'📌':x.ic,t:x.n,lab:1})),null,'rm',{path:R.pts,done,veh:p>0?{la:cur.la,lo:cur.lo,ic:MD[S.m][0]}:null})}</div><div class="nvi">${ins}</div><div class="bar"><i style="width:${p*100}%"></i></div><div class="cap">${p>0&&p<1?MD[S.m][1]+' km/j · ':''}Sisa ${fd(left)} · ${ft(tm(S.m,left))} · tiba ≈ ${eta(tm(S.m,left))}</div><div class="btns"><button class="btn" onclick="nvT()">${S.run?'⏸ Jeda':p>=1?'⟲ Ulangi':'▶ Mulai navigasi'}</button><button class="btn sec" style="flex:none" aria-label="Suara" onclick="S.vo=!S.vo;if(S.vo)say('Navigasi suara aktif');nvU()">${S.vo?'🔊':'🔇'}</button><button class="btn sec" style="flex:none" aria-label="Ikuti" onclick="S.fl=!S.fl;nvU()">${S.fl?'🎯':'🗺️'}</button>${[1,3,8].map(x=>`<button class="btn sec" style="flex:none;${S.sx===x?'outline:2px solid var(--pr)':''}" onclick="S.sx=${x};nvU()">×${x}</button>`).join('')}</div>`}
+function vRute(){const A=P(S.a),B=P(S.b),R=RT(),d=R.tot,M=MD[S.m],t=tm(S.m,d),rec=d<2?'walk':d<10?'moto':d<400?'car':d<1500?'train':'plane',rid=S.a+'>'+S.b,ok=![S.a,S.b].some(x=>x[0]==='@'),b=brg(A,B);
+const warn=(S.m==='walk'&&d>30)||(S.m==='bike'&&d>150)||(['car','moto','bus'].includes(S.m)&&d>2500)||(S.m==='plane'&&d<150);
+const gm='https://www.google.com/maps/dir/?api=1&origin='+A.la+','+A.lo+'&destination='+B.la+','+B.lo+(S.stops.length?'&waypoints='+S.stops.map(P).map(p=>p.la+','+p.lo).join('%7C'):'')+'&travelmode='+({walk:'walking',bike:'bicycling',bus:'transit',train:'transit'}[S.m]||'driving');
+const txt=`Rute ${A.n} → ${B.n}: ${fd(d)}, ${M[0]} ${ft(t)}`;
+return head('Rencanakan rute','NAVIGASI & ESTIMASI')+`<div class="card"><label class="cap">DARI</label>${sl(S.a,'a')}${S.stops.map((s,i)=>`<div class="step">📌 ${P(s).n}<i style="margin-left:auto;cursor:pointer;font-style:normal" role="button" aria-label="Hapus" onclick="S.stops.splice(${i},1);S.p=0;render()">✕</i></div>`).join('')}<label class="cap">KE</label>${sl(S.b,'b')}
+<select style="margin-top:8px" onchange="if(this.value){S.stops.push(this.value);S.p=0;S.run=0;render()}"><option value="">＋ Tambah pemberhentian</option>${OPT()}</select><div class="btns"><button class="btn sec" onclick="const t=S.a;S.a=S.b;S.b=t;S.stops.reverse();S.p=0;render()">⇅ Tukar</button></div></div>
+<div class="sc">${Object.keys(MD).map(k=>`<button class="chip ${S.m===k?'on':''}" onclick="setR('m','${k}')">${MD[k][0]}${k===rec?'⭐':''}<small>${ft(tm(k,d))}</small></button>`).join('')}</div>
+${alts(d)}<div class="sum"><big>${t>=60&&S.m==='plane'?'✈️ ':''}${ft(t)}</big><small>≈ ${fd(d)} garis lurus${S.m==='plane'?'':' (+25% jalur)'} · tiba ≈ ${eta(t)}</small></div>
+<div class="g3"><div><b>${M[2]?'Rp '+(Math.round(d*(S.m==='plane'?1:1.25)*M[2]/1000)*1000).toLocaleString('id-ID'):'Gratis'}</b>Biaya</div><div><b>${(d*(S.m==='plane'?1:1.25)*M[3]/1000).toFixed(1)} kg</b>CO₂</div><div><b>${Math.round(b)}° ${dn(b)}</b>Arah awal</div></div>
+${warn?'<p class="cap">⚠️ Moda ini kurang realistis untuk jarak tersebut. Coba moda bertanda ⭐.</p>':''}<p class="cap">Estimasi ilustratif dari jarak garis lurus, bukan lalu lintas langsung atau tarif resmi.</p>
+<div id="nv">${nvBox()}</div>
+<h2>Gambaran perjalanan</h2>${R.legs.map((l,i)=>{const bb=brg(R.ids[i],R.ids[i+1]);return`<div class="step">🧭 ${R.ids[i].n} → ${R.ids[i+1].n}<br><span class="cap">${fd(l)} ke ${dn(bb)} (${Math.round(bb)}°) · ${ft(tm(S.m,l))}</span></div>`}).join('')}
+<div class="btns"><button class="btn" ${ok?`onclick="svR('${rid}')"`:'disabled style="opacity:.5"'}>${S.sr.includes(rid)?'★ Tersimpan':'🔖 Simpan'}</button><button class="btn sec" onclick="cpy('${txt}')">📋 Salin</button><button class="btn sec" onclick="shr()">🔗 Bagikan</button></div><div class="btns"><a class="btn sec" href="${gm}" target="_blank" rel="noopener">🌍 Buka navigasi nyata di Google Maps</a></div>`}
+function cmpSvg(){const o=S.me||P(S.a),bb=brg(o,P(S.b)),h=S.hd||0;let k='';for(let i=0;i<360;i+=30){const m=i%90===0;k+=`<line x1="100" y1="${m?10:14}" x2="100" y2="20" stroke="var(--mu)" stroke-width="${m?2:1}" transform="rotate(${i} 100 100)"/>`}
+const L=[['U',0],['T',90],['S',180],['B',270]].map(([c,a])=>`<text x="100" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="${c==='U'?'#d33':'var(--tx)'}" transform="rotate(${a} 100 100)">${c}</text>`).join('');
+return`<svg class="cmp" viewBox="0 0 200 200" role="img" aria-label="Kompas"><circle cx="100" cy="100" r="92" fill="var(--card)" stroke="var(--bd)" stroke-width="3"/><g id="dial" transform="rotate(${-h} 100 100)">${k}${L}<g transform="rotate(${bb} 100 100)"><path d="M100 50 L109 80 L91 80Z" fill="var(--pr)"/><line x1="100" y1="80" x2="100" y2="100" stroke="var(--pr)" stroke-width="3"/></g>${S.kb?`<g transform="rotate(${brg(o,KB)} 100 100)"><path d="M100 28 L106 50 L94 50Z" fill="#e0a800"/></g>`:''}</g><path d="M100 2 L107 15 L93 15Z" fill="#d33"/><circle cx="100" cy="100" r="4" fill="var(--tx)"/></svg>`}
+function vAlat(){const o=S.me||CM[S.sel],t=P(S.b),bb=brg(o,t),m=S.me,near=[];C.forEach(c=>c.l.forEach(l=>catOk(l.ic)&&near.push({l,d:hav(o,l)})));near.sort((x,y)=>x.d-y.d);
+return head('Alat navigasi','KOMPAS · GPS · TERDEKAT')+`<div class="card" style="text-align:center">${cmpSvg()}<div class="nvi" id="hd">${S.hd!=null?Math.round(S.hd)+'° '+dn(S.hd):'Sensor belum aktif'}</div>${S.kb?`<div class="cap">🕋 Kiblat dari ${S.me?'posisi Anda':CM[S.sel].n}: ${Math.round(brg(o,KB))}° ${dn(brg(o,KB))} · ${fd(hav(o,KB))} (panah emas; aktifkan GPS agar akurat)</div>`:''}<div class="cap">Panah hijau menunjuk ${t.n}: ${Math.round(bb)}° ${dn(bb)} · ${fd(hav(o,t))}</div><div class="btns"><button class="btn" onclick="startCmp()">🧭 ${S.cs?'Kompas aktif':'Aktifkan kompas'}</button><button class="btn sec" onclick="S.kb=!S.kb;render()">🕋 Kiblat ${S.kb?'✓':''}</button></div></div>
+<h2>Lokasi saya</h2><div class="card">${m?`<b>${m.la.toFixed(5)}°, ${m.lo.toFixed(5)}°</b><div class="cap">${dms(m.la,'U','S')} ${dms(m.lo,'T','B')}<br>Akurasi ±${Math.round(m.ac)} m${m.sp>0?' · '+(m.sp*3.6).toFixed(0)+' km/j':''}</div>`:`<span class="cap">${S.err||'Aktifkan GPS untuk melihat posisi dan landmark terdekat.'}</span>`}
+<div class="btns"><button class="btn" onclick="loc()">📡 Temukan saya</button><button class="btn sec" onclick="trk()">${S.w!=null?'⏹ Stop lacak':'📍 Lacak langsung'}</button></div>${m?`<div class="btns"><button class="btn sec" onclick="cpy('${m.la.toFixed(6)}, ${m.lo.toFixed(6)}')">📋 Salin</button><button class="btn sec" onclick="S.tab='peta';S.f='all';focus(S.me.lo,S.me.la,20);render()">🗺️ Di peta</button></div>`:''}</div>
+<h2>Terdekat dari ${m?'Anda':CM[S.sel].n}</h2><div class="sc">${CATS.map((c,i)=>`<button class="chip ${(S.cat||0)===i?'on':''}" onclick="S.cat=${i};render()">${c[0]}</button>`).join('')}</div>${near.slice(0,6).map(x=>`<div class="card"><div class="row" style="cursor:default"><div class="ic">${x.l.ic}</div><div><b>${x.l.n}</b><span>${x.l.city} · ${fd(x.d)} · ${dn(brg(o,x.l))}</span></div><i role="button" aria-label="Rute" style="cursor:pointer" onclick="goR('${x.l.id}')">🧭</i></div></div>`).join('')}
+${wc()}<h2>Pengaturan</h2><div class="card"><div class="cap">MODE GELAP</div>${[['light','Mati (terang)'],['dark','Hidup (gelap)'],['auto','Gunakan pengaturan perangkat']].map(x=>`<div class="rad" role="radio" aria-checked="${S.th===x[0]}" onclick="S.th='${x[0]}';persist();render()"><span>${x[1]}</span><i class="${S.th===x[0]?'on':''}"></i></div>`).join('')}<div class="cap">Otomatis mengikuti tema terang/gelap di perangkat Anda.</div><div class="cap" style="margin-top:12px">SATUAN JARAK</div><div class="chips">${['km','mi'].map(u=>`<button class="chip ${S.u===u?'on':''}" onclick="S.u='${u}';persist();render()">${u}</button>`).join('')}</div></div>`}
+render=function(){const v=document.getElementById('v'),k=v.scrollTop;aT();v.innerHTML=({peta:vPeta,jelajah:vJelajah,rute:vRute,alat:vAlat,simpan:vSimpan})[S.tab]();v.scrollTop=k;
+document.getElementById('nav').innerHTML=[['peta','🗺️','Peta'],['jelajah','🌐','Jelajahi'],['rute','🧭','Rute'],['alat','📡','Alat'],['simpan','🔖','Tersimpan']].map(x=>`<button ${S.tab===x[0]?'aria-current="page"':''} onclick="tab('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join('');if(S.tab==='peta')bind()};
+render();
+</script>
+<style>
+.sheet{position:fixed;left:0;right:0;bottom:70px;max-width:480px;margin:0 auto;background:var(--card);border:1px solid var(--bd);border-radius:20px 20px 16px 16px;padding:14px;box-shadow:0 -6px 24px rgba(0,0,0,.18);z-index:5}
+.sheet h3{margin:0;font-size:18px}.sheet .x{position:absolute;right:10px;top:8px;border:0;background:none;color:var(--mu);font-size:18px;cursor:pointer}
+.sheet .g3{margin:10px 0 0}.sheet .btns{flex-wrap:wrap}.sheet .btn{font-size:13px;padding:9px 10px}
+</style>
+<script>
+let LP=0;
+function m2g(e,s){const r=s.getBoundingClientRect();return{lo:V[0]+(e.clientX-r.left)/r.width*V[2]-180,la:90-(V[1]+(e.clientY-r.top)/r.height*V[2]*.7)}}
+function sunp(){const t=new Date(),n=(t-Date.UTC(t.getUTCFullYear(),0,0))/864e5,d=23.44*Math.sin(rad(360/365*(n-81))),h=t.getUTCHours()+t.getUTCMinutes()/60;return{d:Math.abs(d)<.05?.05:d,lo:-(h-12)*15}}
+function night(){const s=sunp(),a=[];for(let lo=-180;lo<=180;lo+=4){const H=rad(lo-s.lo);a.push((lo+180)+','+(90-deg(Math.atan(-Math.cos(H)/Math.tan(rad(s.d))))))}return a.concat(s.d>0?['360,180','0,180']:['360,0','0,0']).join(' ')}
+function sunT(o){const t=new Date(),n=Math.floor((t-Date.UTC(t.getUTCFullYear(),0,0))/864e5),B=rad(360/365*(n-81)),d=rad(23.44*Math.sin(B)),c=-Math.tan(rad(o.la))*Math.tan(d);if(c>1)return['Tidak terbit','—'];if(c<-1)return['Tidak terbenam','—'];const H=deg(Math.acos(c))/15,eq=9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B),nn=12-o.lo/15-eq/60+Math.round(o.lo/15),f=x=>{x=((x%24)+24)%24;return String(Math.floor(x)).padStart(2,'0')+':'+String(Math.floor(x%1*60)).padStart(2,'0')};return[f(nn-H),f(nn+H)]}
+function say(t){try{if(S.vo&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s.,°]/gu,''));u.lang='id-ID';speechSynthesis.speak(u)}}catch(e){}}
+function vc(){const k=Math.floor(S.p*10);if(k!==S.vk){S.vk=k;const i=document.querySelector('#nv .nvi');if(i)say(i.textContent)}}
+function mk(id){const[t,v]=[id[0],id.slice(2)];if(t==='k'){const z=D[+v].z;focus(z[0],z[1],z[2])}else{const c=t==='c'?CM[v]:CM[LM[v].city];S.sel=c.id;S.sheet=t==='l'?'lm:'+v:'city:'+c.id;if(V[2]>200)focus(c.lo,c.la,60)}render()}
+function toR(id,from){if(from){S.a=id}else{S.b=id;if(S.a===id||(S.a==='@me'&&!S.me))S.a=S.me?'@me':CM[S.sel].l[0].id}if(S.a===S.b)S.a='Jakarta|Monas';S.stops=[];tab('rute')}
+function sheet(){const s=S.sheet;if(!s)return'';let o,t,ic,sub,id,sv_='';
+if(s==='pin'&&S.pin){o=S.pin;t='Pin saya';ic='📌';sub='Titik yang Anda tandai (tekan lama di peta)';id='@pin'}
+else if(s.slice(0,3)==='lm:'&&LM[s.slice(3)]){o=LM[s.slice(3)];t=o.n;ic=o.ic;sub=o.city+' · '+CM[o.city].co;id=o.id;sv_=`<button class="btn sec" onclick="tog('l:${id}')">${sv('l:'+id)?'★ Tersimpan':'☆ Simpan'}</button>`}
+else if(s.slice(0,5)==='city:'&&CM[s.slice(5)]){o=CM[s.slice(5)];t=o.n;ic='📍';sub=o.co+' · '+D[o.bi].n;id=o.l[0].id;sv_=`<button class="btn sec" onclick="tog('c:${o.id}')">${sv('c:'+o.id)?'★ Tersimpan':'☆ Simpan'}</button>`}else return'';
+const off=Math.round(o.lo/15),w=new Date(Date.now()+off*36e5),tt=String(w.getUTCHours()).padStart(2,'0')+':'+String(w.getUTCMinutes()).padStart(2,'0'),su=sunT(o),fr=S.me?fd(hav(S.me,o)):'—';
+return`<div class="sheet"><button class="x" aria-label="Tutup" onclick="S.sheet=null;render()">✕</button><h3>${ic} ${t}</h3><div class="cap">${sub}</div><div class="cap">${o.la.toFixed(4)}°, ${o.lo.toFixed(4)}°</div>
+<div class="g3"><div><b>${tt}</b>Jam setempat*</div><div><b>${su[0]} · ${su[1]}</b>Terbit · terbenam</div><div><b>${fr}</b>Dari Anda</div></div>
+<div class="cap" style="margin-top:8px">${zn(o)} · ${df(off)}</div>${id[0]!=='@'?`<input placeholder="Catatan pribadi…" value="${(S.nts[id]||'').replace(/"/g,'&quot;')}" onchange="S.nts['${id}']=this.value;persist()" style="margin-top:6px;padding:8px 10px">`:''}<div class="btns"><button class="btn" onclick="toR('${id}')">🧭 Rute ke sini</button><button class="btn sec" onclick="toR('${id}',1)">Mulai dari sini</button></div><div class="btns">${sv_}<button class="btn sec" onclick="S.stops.push('${id}');S.p=0;tab('rute')">＋ Singgah</button><button class="btn sec" onclick="cpy('${o.la.toFixed(5)}, ${o.lo.toFixed(5)}')">📋</button></div><div class="cap">*Perkiraan dari bujur, bisa meleset di wilayah tertentu.</div></div>`}
+const _vp=vPeta;vPeta=function(){return _vp()+sheet()};
+render();
+</script>
+<script>
+const CATS=[['Semua',''],['Ibadah','🕌⛪🛕⛩️🕋'],['Alam','🌋🏞️🏔️🏖️🏝️⛰️🌲💦🌿🐠🏜️🧊🪨'],['Sejarah','🏰🏛️🏯🧱🗿🔺'],['Kota','🌉🏙️🗼🌆🏘️🎭🏟️']];
+const catOk=ic=>!CATS[S.cat||0][1]||CATS[S.cat||0][1].includes(ic);
+const rowH=k=>{const t=k[0],id=k.slice(2),o=t==='c'?CM[id]:LM[id];if(!o)return'';return`<div class="card"><button class="row" onclick="pick('${t}','${id}')"><div class="ic">${t==='c'?'📍':o.ic}</div><div><b>${o.n}</b><span>${t==='c'?o.co+' · '+D[o.bi].n:o.city+' · '+CM[o.city].co}</span></div></button></div>`};
+function pick(t,id){const k=t+':'+id;S.rc=[k,...S.rc.filter(x=>x!==k)].slice(0,5);persist();S.q='';const o=t==='c'?CM[id]:LM[id],c=t==='c'?o:CM[o.city];S.sel=c.id;S.sheet=t==='c'?'city:'+id:'lm:'+id;S.f=S.f==='ms'?'all':S.f;focus(o.lo,o.la,t==='c'?40:18);render()}
+function search(q){S.q=q;const r=document.getElementById('res');if(!r)return;const t=q.trim().toLowerCase(),m=q.match(/^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/);
+if(m&&Math.abs(+m[1])<=90&&Math.abs(+m[2])<=180){r.innerHTML=`<div class="card"><button class="row" onclick="S.pin={la:${+m[1]},lo:${+m[2]}};S.sheet='pin';S.q='';focus(${+m[2]},${+m[1]},30);render()"><div class="ic">📌</div><div><b>Pin di koordinat</b><span>${m[1]}, ${m[2]}</span></div></button></div>`;return}
+if(!t){r.innerHTML=S.rc.length?'<div class="cap">TERAKHIR DICARI</div>'+S.rc.map(rowH).join(''):'';return}
+const h=[];C.forEach(c=>{const a=c.n.toLowerCase(),b=(c.co+' '+D[c.bi].n).toLowerCase();if(a.includes(t)||b.includes(t))h.push([a.startsWith(t)?0:a.includes(t)?1:3,'c:'+c.id]);c.l.forEach(l=>{const n=l.n.toLowerCase();if(n.includes(t))h.push([n.startsWith(t)?0:2,'l:'+l.id])})});
+h.sort((x,y)=>x[0]-y[0]);r.innerHTML=h.slice(0,8).map(x=>rowH(x[1])).join('')||'<p class="cap">Tidak ditemukan. Coba nama lain atau koordinat, mis. -6.2, 106.8</p>'}
+const okm=(k,d)=>k==='walk'?d<=30:k==='bike'?d<=150:k==='plane'?d>=150:k==='train'?d>=30&&d<=3000:d<=2500;
+function alts(d){const F=Object.keys(MD).filter(k=>okm(k,d));if(!F.length)return'';const cost=k=>MD[k][2],co=k=>MD[k][3],by=f=>F.slice().sort((a,b)=>f(a)-f(b)||tm(a,d)-tm(b,d))[0];return`<div class="g3">${[['⚡','Tercepat',by(k=>tm(k,d))],['💰','Hemat',by(cost)],['🌱','Hijau',by(co)]].map(x=>`<div style="cursor:pointer" onclick="setR('m','${x[2]}')"><b>${x[0]} ${MD[x[2]][0]}</b>${x[1]} · ${ft(tm(x[2],d))}</div>`).join('')}</div>`}
+function trip(){const pts=S.sv.map(id=>{const v=id.slice(2),o=id[0]==='c'?CM[v]:LM[v];return o?{id:id[0]==='c'?o.l[0].id:v,la:o.la,lo:o.lo}:0}).filter((x,i,a)=>x&&a.findIndex(y=>y.id===x.id)===i);if(pts.length<2)return toast('Simpan minimal 2 tempat');const o=[pts.shift()];while(pts.length){const l=o[o.length-1];pts.sort((a,b)=>hav(l,a)-hav(l,b));o.push(pts.shift())}S.a=o[0].id;S.b=o[o.length-1].id;S.stops=o.slice(1,-1).slice(0,8).map(x=>x.id);toast('Urutan dioptimalkan: '+o.length+' titik');tab('rute')}
+const _vs=vSimpan;vSimpan=function(){let h=_vs();if(S.st==='p'&&S.sv.length>=2)h+='<div class="btns"><button class="btn" onclick="trip()">🗺️ Buat rute dari tempat tersimpan</button></div>';return h};
+function shr(){let b='';try{b=location.href.split('#')[0]}catch(e){}cpy(b+'#r='+encodeURIComponent([S.a,...S.stops,S.b].join('>'))+'&m='+S.m)}
+(function(){try{const h=decodeURIComponent(location.hash||''),m=h.match(/r=([^&]+)/);if(m){const a=m[1].split('>').filter(x=>LM[x]);if(a.length>=2){S.a=a[0];S.b=a[a.length-1];S.stops=a.slice(1,-1);const k=h.match(/m=(\w+)/);if(k&&MD[k[1]])S.m=k[1];S.tab='rute'}}}catch(e){}})();
+render();
+</script>
+<style>
+.sbar{position:absolute;left:8px;bottom:6px;height:8px;border:2px solid var(--tx);border-top:0;font-size:10px;color:var(--tx);pointer-events:none}
+.sbar span{position:absolute;left:0;bottom:8px;white-space:nowrap;background:var(--card);padding:0 4px;border-radius:4px}
+</style>
+<script>
+const KB={la:21.4225,lo:39.8262};
+function sbv(){const la=90-(V[1]+V[2]*.35),W=Math.max(1,V[2]*111.32*Math.cos(rad(la))),q=W/4,p=10**Math.floor(Math.log10(q)),n=[5,2,1].map(x=>x*p).find(x=>x<=q)||p;return[Math.min(60,n/W*100),fd(n)]}
+function sb(){const[w,t]=sbv();return`<div class="sbar" id="sb" style="width:${w}%"><span>${t}</span></div>`}
+const _rd=rdt;rdt=function(){const e=document.getElementById('sb');if(e){const[w,t]=sbv();e.style.width=w+'%';e.firstChild.textContent=t}return _rd()};
+const _vp2=vPeta;vPeta=function(){return _vp2().replace('<div class="ctl">',sb()+'<div class="ctl">')};
+function ar(){const a=S.ms;if(a.length<3)return'';const l0=a[0].la,k=Math.cos(rad(l0))*111.32,q=a.map(p=>[(p.lo-a[0].lo)*k,(p.la-l0)*110.57]);let s=0;for(let i=0;i<q.length;i++){const[x1,y1]=q[i],[x2,y2]=q[(i+1)%q.length];s+=x1*y2-x2*y1}const A=Math.abs(s)/2;return' · luas ≈ '+(S.u==='mi'?(A*.3861).toFixed(0)+' mi²':Math.round(A).toLocaleString('id-ID')+' km²')}
+const zn=o=>{const a=Math.abs(o.la);return a<23.5?'Zona tropis':a<40?'Zona subtropis':a<66.5?'Zona sedang':'Zona kutub'};
+const df=off=>{const d=Math.round(off+new Date().getTimezoneOffset()/60);return d===0?'waktu sama dengan Anda':(d>0?'+':'')+d+' jam dari waktu Anda'};
+function wc(){const ids=[...new Set([S.sel,...S.sv.filter(x=>x[0]==='c').map(x=>x.slice(2))])].filter(x=>CM[x]).slice(0,5);return`<h2>Jam dunia</h2><div class="card">${ids.map(id=>{const c=CM[id],off=Math.round(c.lo/15),w=new Date(Date.now()+off*36e5),h=w.getUTCHours();return`<div class="step">${h>=6&&h<18?'☀️':'🌙'} <b>${c.n}</b><span style="margin-left:auto">${String(h).padStart(2,'0')}:${String(w.getUTCMinutes()).padStart(2,'0')} · UTC${off>=0?'+':''}${off}</span></div>`}).join('')}<div class="cap">Perkiraan dari bujur kota. Simpan kota (★) untuk menambah jam.</div></div>`}
+render();
+</script>
+<style>.rad{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;cursor:pointer;font-size:15px}.rad i{width:22px;height:22px;border-radius:50%;border:2px solid var(--mu);display:grid;place-items:center;flex:none}.rad i.on{border-color:var(--pr)}.rad i.on::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--pr)}</style></body></html>
